@@ -47,8 +47,14 @@
             </div>
 
             <div class="flex gap-4 px-2">
-                <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-400"></div><span class="text-xs font-medium text-blue-100">Week Exp: <span id="dispWeek" class="text-white font-bold ml-1">0</span></span></div>
-                <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-400"></div><span class="text-xs font-medium text-blue-100">To Recv: <span id="dispRecv" class="text-white font-bold ml-1">0</span></span></div>
+                <div class="flex items-center gap-2" onclick="showWeekDetails()">
+                    <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div>
+                    <span class="text-xs font-medium text-blue-100 underline decoration-blue-400/50 underline-offset-2">Week Exp: <span id="dispWeek" class="text-white font-bold ml-1">0</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                    <span class="text-xs font-medium text-blue-100">To Recv: <span id="dispRecv" class="text-white font-bold ml-1">0</span></span>
+                </div>
             </div>
         </div>
     </div>
@@ -66,14 +72,17 @@
 
         <!-- History -->
         <div>
-            <h2 class="font-bold text-slate-400 text-xs uppercase tracking-wide px-1 mb-2">Recent History</h2>
+            <div class="flex justify-between items-center px-1 mb-2">
+                <h2 class="font-bold text-slate-400 text-xs uppercase tracking-wide">Recent History</h2>
+                <button onclick="showAllHistory()" class="text-blue-600 text-xs font-bold active:opacity-50">View All</button>
+            </div>
             <div id="transList" class="space-y-2"></div>
         </div>
 
         <!-- Attribution Footer -->
         <div class="text-center pb-4 pt-4">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Created By</p>
-            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood</p>
+            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v6.0</span></p>
         </div>
     </div>
 
@@ -94,6 +103,7 @@
     </div>
 
     <!-- MODALS -->
+    
     <!-- Form Modal -->
     <div id="modal-form" class="modal-overlay fixed inset-0 bg-black/60 z-50 flex flex-col justify-end backdrop-blur-sm">
         <div class="modal-content bg-white w-full rounded-t-[2rem] h-[90vh] flex flex-col shadow-2xl">
@@ -125,9 +135,29 @@
                 </button>
             </div>
             <button onclick="openForm('account')" class="w-full p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center gap-3 font-bold text-blue-700 active:scale-95 transition">
-                <i class="fa-solid fa-building-columns"></i> Bank Transfer / Deposit
+                <i class="fa-solid fa-building-columns"></i> Bank Transfer
             </button>
         </div>
+    </div>
+
+    <!-- Full History Modal -->
+    <div id="modal-history" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 class="font-bold text-lg">All Transactions</h3>
+            <div class="w-10"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="fullHistoryList"></div>
+    </div>
+
+    <!-- Week Details Modal -->
+    <div id="modal-week" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 class="font-bold text-lg">Week Details</h3>
+            <div class="w-10"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div>
     </div>
 
     <!-- Add Person -->
@@ -167,41 +197,48 @@
             <div class="space-y-3">
                 <button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-blue-500"></i> Backup Data</button>
                 <label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-blue-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label>
-                <button onclick="resetWeekCounter()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button>
+                <button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button>
                 <button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button>
             </div>
             <button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button>
         </div>
     </div>
 
+    <!-- Reset Options Sub-Modal -->
+    <div id="modal-reset-opts" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 class="font-bold text-lg mb-4 text-slate-800">What to reset?</h3>
+            <div class="space-y-2">
+                <button onclick="resetWeekExpensesOnly()" class="w-full p-3 bg-blue-50 text-blue-700 rounded-xl font-bold">Reset Expenses Only</button>
+                <button onclick="resetBalance('CASH')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Cash to 0</button>
+                <button onclick="resetBalance('BANK')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Bank to 0</button>
+            </div>
+            <button onclick="document.getElementById('modal-reset-opts').classList.remove('active')" class="w-full py-3 mt-2 text-slate-400 font-bold">Cancel</button>
+        </div>
+    </div>
+
     <!-- LOGIC -->
     <script>
-        // --- 1. CONFIG & INIT ---
-        const APP_VERSION = '5.0'; 
+        const APP_VERSION = '6.0'; 
         let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [] };
         let currentFormType = '';
 
-        // Initialize Service Worker for Offline Mode
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Fail', err));
-            });
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem("splitifyData_v5");
+            const saved = localStorage.getItem("splitifyData_v6");
             if (saved) appData = JSON.parse(saved);
             recalculate();
         };
 
         function saveData() {
-            localStorage.setItem("splitifyData_v5", JSON.stringify(appData));
+            localStorage.setItem("splitifyData_v6", JSON.stringify(appData));
             recalculate();
         }
 
-        // --- 2. CORE MATH ENGINE ---
+        // --- CORE MATH ---
         function recalculate() {
             let c = 0, b = 0, w = 0;
             let pBal = {};
@@ -211,35 +248,34 @@
                 const amt = parseInt(t.amt) || 0;
                 const tax = parseInt(t.tax) || 0;
                 const p = t.person;
-                if(p && p !== 'Self' && pBal[p] === undefined) pBal[p] = 0;
+                const isBank = t.source === 'BANK';
+                const isCurrentWeek = !t.weekReset;
 
-                // weekReset: true means this transaction is from a previous week
-                const isCurrentWeek = !t.weekReset; 
+                if(p && p !== 'Self' && pBal[p] === undefined) pBal[p] = 0;
 
                 switch(t.type) {
                     case 'EXPENSE': 
-                        c -= amt; 
+                        if(isBank) b -= amt; else c -= amt;
                         if(isCurrentWeek) w += amt; 
                         break;
                     case 'RECEIVED': 
-                        c += amt; 
+                        if(isBank) b += amt; else c += amt;
                         if(p && p!=='Self') pBal[p] -= amt; 
                         break; 
                     case 'DEBIT': 
-                        c -= amt; 
+                        if(isBank) b -= amt; else c -= amt;
                         if(p && p!=='Self') pBal[p] += amt; 
                         break;    
                     case 'ACC_SENT': 
                         b -= amt; 
-                        if(p==='Self') { if(isCurrentWeek) w+=amt; } 
-                        else if(p) pBal[p]+=amt; 
+                        if(p && p!=='Self') pBal[p]+=amt; 
                         break;
-                    case 'ACC_RECV': 
+                    case 'ACC_RECV': // Kept for legacy compatibility
                         b += amt; 
                         if(p && p!=='Self') pBal[p]-=amt; 
                         break;
                     case 'SPLIT_MAIN': 
-                        c -= amt; 
+                        if(isBank) b -= amt; else c -= amt;
                         break; 
                     case 'SPLIT_SHARE': 
                         if(isCurrentWeek) w += amt; 
@@ -247,37 +283,17 @@
                     case 'SPLIT_DEBIT': 
                         if(p) pBal[p] += amt; 
                         break;
-                    // Transfer Logic
-                    case 'TRF_WDL': 
-                        b -= (amt + tax); c += amt; 
-                        if(isCurrentWeek) w += tax; 
-                        break; 
-                    case 'TRF_DEP': 
-                        c -= (amt + tax); b += amt; 
-                        if(isCurrentWeek) w += tax; 
-                        break; 
+                    case 'BALANCE_CORRECTION':
+                        if(t.mode === 'IN') { if(isBank) b += amt; else c += amt; }
+                        else { if(isBank) b -= amt; else c -= amt; }
+                        break;
                 }
             });
-
             appData.cash = c; appData.bank = b; appData.week = w; appData.people = pBal;
             renderUI();
         }
 
-        function resetWeekCounter() {
-            if(confirm('Start new week? Expenses will be archived.')){
-                appData.trans.forEach(t => {
-                    // Archive only types that contribute to weekly expense
-                    if(['EXPENSE', 'ACC_SENT', 'SPLIT_SHARE', 'TRF_WDL', 'TRF_DEP'].includes(t.type)) {
-                        t.weekReset = true;
-                    }
-                });
-                saveData();
-                closeModal();
-                alert("New Week Started! Expense counter is 0.");
-            }
-        }
-
-        // --- 3. RENDERING UI ---
+        // --- RENDERING ---
         function renderUI() {
             document.getElementById('dispCash').innerText = appData.cash.toLocaleString();
             document.getElementById('dispBank').innerText = appData.bank.toLocaleString();
@@ -290,7 +306,6 @@
             list.innerHTML = '';
             
             const entries = Object.entries(appData.people);
-            // SORT: Payable (Negative) at Top, Receivable (Positive) at Bottom
             const youOwe = entries.filter(([n, b]) => b < 0).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])); 
             const owesYou = entries.filter(([n, b]) => b >= 0).sort((a,b) => b[1] - a[1]); 
             const sortedPeople = [...youOwe, ...owesYou];
@@ -318,34 +333,44 @@
                     </div>`;
             });
 
-            const tList = document.getElementById('transList');
-            tList.innerHTML = '';
-            [...appData.trans].reverse().slice(0, 20).forEach((t, index) => {
-                const realIndex = appData.trans.length - 1 - index;
-                let icon = 'fa-receipt'; let color = 'bg-slate-100 text-slate-500';
-                if(t.type.includes('EXPENSE') || t.type.includes('SHARE')) { icon = 'fa-arrow-trend-down'; color = 'bg-red-100 text-red-500'; }
-                else if(t.type === 'RECEIVED' || t.type === 'ACC_RECV') { icon = 'fa-arrow-down'; color = 'bg-green-100 text-green-500'; }
-                else if(t.type.includes('DEBIT') || t.type === 'ACC_SENT') { icon = 'fa-arrow-up'; color = 'bg-orange-100 text-orange-500'; }
-                else if(t.type.includes('TRF')) { icon = 'fa-repeat'; color = 'bg-blue-100 text-blue-500'; }
+            // Render Recent 10
+            renderTransList([...appData.trans].reverse().slice(0, 10), 'transList');
+        }
 
-                tList.innerHTML += `
+        function renderTransList(arr, elId) {
+            const el = document.getElementById(elId);
+            el.innerHTML = '';
+            // Note: arr is already reversed subset
+            arr.forEach((t) => {
+                // Find original index in main array for deletion
+                const realIndex = appData.trans.indexOf(t);
+                let icon = 'fa-receipt'; let color = 'bg-slate-100 text-slate-500';
+                
+                if(t.type.includes('EXPENSE') || t.type.includes('SHARE')) { icon = 'fa-arrow-trend-down'; color = 'bg-red-100 text-red-500'; }
+                else if(t.type === 'RECEIVED' || t.type === 'ACC_RECV' || (t.type === 'BALANCE_CORRECTION' && t.mode==='IN')) { icon = 'fa-arrow-down'; color = 'bg-green-100 text-green-500'; }
+                else if(t.type.includes('DEBIT') || t.type === 'ACC_SENT' || (t.type === 'BALANCE_CORRECTION' && t.mode==='OUT')) { icon = 'fa-arrow-up'; color = 'bg-orange-100 text-orange-500'; }
+
+                let amtDisplay = parseInt(t.amt).toLocaleString();
+                let sourceBadge = t.source === 'BANK' ? '<span class="text-[9px] bg-blue-100 text-blue-600 px-1 rounded ml-2">BANK</span>' : '';
+
+                el.innerHTML += `
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
                         <div class="flex items-center gap-3 overflow-hidden">
                             <div class="w-10 h-10 rounded-full ${color} flex items-center justify-center shrink-0"><i class="fa-solid ${icon}"></i></div>
                             <div class="min-w-0">
-                                <p class="font-bold text-slate-700 truncate text-sm">${t.desc}</p>
+                                <p class="font-bold text-slate-700 truncate text-sm flex items-center">${t.desc} ${sourceBadge}</p>
                                 <p class="text-[10px] text-slate-400 font-bold uppercase">${t.date} • ${t.person || 'Self'}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 pl-2">
-                            <span class="font-bold text-slate-800">${parseInt(t.amt).toLocaleString()}</span>
-                            <button onclick="if(confirm('Delete transaction?')){appData.trans.splice(${realIndex},1);saveData();}" class="text-slate-300 hover:text-red-500 px-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <span class="font-bold text-slate-800">${amtDisplay}</span>
+                            <button onclick="if(confirm('Delete transaction?')){appData.trans.splice(${realIndex},1);saveData();${elId==='fullHistoryList'?'showAllHistory()':''}}" class="text-slate-300 hover:text-red-500 px-2"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>`;
             });
         }
 
-        // --- 4. FORMS ---
+        // --- MODALS & FORMS ---
         function openForm(type) {
             closeModal(); currentFormType = type;
             document.getElementById('modal-form').classList.add('active');
@@ -353,42 +378,41 @@
             const title = document.getElementById('formTitle');
             const pOptions = Object.keys(appData.people).map(p => `<option value="${p}">${p}</option>`).join('');
             
-            // UI Components
+            // Source Toggle (Cash/Account)
+            const sourceSelect = `
+                <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Paid Via</label>
+                    <div class="flex p-1 bg-slate-100 rounded-xl mt-2">
+                        <button onclick="setSource('CASH', this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition">Cash</button>
+                        <button onclick="setSource('BANK', this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400 transition">Bank Account</button>
+                    </div>
+                    <input type="hidden" id="inpSource" value="CASH">
+                </div>`;
+
             const amtInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Amount</label><div class="relative mt-2"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">Rs</span><input type="number" id="inpAmt" class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-2xl outline-none focus:border-blue-500 focus:bg-white transition text-slate-800" placeholder="0" autofocus></div></div>`;
-            const taxInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Tax / Fee</label><div class="relative mt-2"><input type="number" id="inpTax" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none focus:border-blue-500 transition" placeholder="0"></div></div>`;
             const descInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Description</label><input type="text" id="inpDesc" class="w-full mt-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none focus:border-blue-500 focus:bg-white transition" placeholder="Details..."></div>`;
-            
+
             if(type === 'account') {
-                title.innerText = "Bank Operations";
+                title.innerText = "Bank Transfer (Friend)";
                 content.innerHTML = `
-                    <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
-                        <button onclick="showBankTab('friend')" id="tabFriend" class="flex-1 py-2 font-bold rounded-lg bg-white shadow text-blue-600 transition">Friend</button>
-                        <button onclick="showBankTab('self')" id="tabSelf" class="flex-1 py-2 font-bold rounded-lg text-slate-400 transition">Self Transfer</button>
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4">
+                        <button onclick="setBankMode('ACC_SENT', this)" class="bg-blue-50 text-blue-600 py-2 rounded-lg font-bold border border-blue-100">Sent</button>
+                        <button onclick="setBankMode('ACC_RECV', this)" class="text-slate-400 py-2 rounded-lg font-bold">Received</button>
                     </div>
-                    <div id="bankFriendPanel">
-                        <div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4">
-                            <button onclick="setBankMode('ACC_SENT', this)" class="bg-blue-50 text-blue-600 py-2 rounded-lg font-bold border border-blue-100">Sent</button>
-                            <button onclick="setBankMode('ACC_RECV', this)" class="text-slate-400 py-2 rounded-lg font-bold">Received</button>
-                        </div>
-                        <input type="hidden" id="bankMode" value="ACC_SENT">
-                        <div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Person</label><div class="relative mt-2"><select id="inpPerson" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none appearance-none"><option value="Self">Self / Home / Deposit</option>${pOptions}</select><i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i></div></div>
-                        ${amtInput} ${descInput}
-                    </div>
-                    <div id="bankSelfPanel" class="hidden">
-                        <div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4">
-                            <button onclick="setBankMode('TRF_WDL', this)" class="bg-blue-50 text-blue-600 py-2 rounded-lg font-bold border border-blue-100">Withdraw</button>
-                            <button onclick="setBankMode('TRF_DEP', this)" class="text-slate-400 py-2 rounded-lg font-bold">Deposit</button>
-                        </div>
-                        ${amtInput} ${taxInput} ${descInput}
-                    </div>`;
+                    <input type="hidden" id="bankMode" value="ACC_SENT">
+                    <div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Person</label><div class="relative mt-2"><select id="inpPerson" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none appearance-none">${pOptions}</select><i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i></div></div>
+                    ${amtInput} ${descInput}`;
             }
-            else if(type === 'expense') { title.innerText = "Add Expense"; content.innerHTML = amtInput + descInput; }
+            else if(type === 'expense') { 
+                title.innerText = "Add Expense"; 
+                content.innerHTML = sourceSelect + amtInput + descInput; 
+            }
             else if(type === 'split') {
                 title.innerText = "Split Bill";
                 let checks = `<div class="grid grid-cols-2 gap-3 mt-4">`;
                 Object.keys(appData.people).forEach(p => checks += `<label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition cursor-pointer"><input type="checkbox" class="w-5 h-5 accent-blue-600 rounded split-check" value="${p}"><span class="font-bold text-slate-700 text-sm">${p}</span></label>`);
                 checks += `</div>`;
-                content.innerHTML = amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Split With</label>${checks}</div>`;
+                content.innerHTML = sourceSelect + amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Split With</label>${checks}</div>`;
             }
             else { 
                 title.innerText = type === 'credit' ? "Received (Credit)" : "Paid (Debit)";
@@ -396,14 +420,12 @@
             }
         }
 
-        window.showBankTab = (tab) => {
-            document.getElementById('tabFriend').className = tab==='friend' ? "flex-1 py-2 font-bold rounded-lg bg-white shadow text-blue-600 transition" : "flex-1 py-2 font-bold rounded-lg text-slate-400 transition";
-            document.getElementById('tabSelf').className = tab==='self' ? "flex-1 py-2 font-bold rounded-lg bg-white shadow text-blue-600 transition" : "flex-1 py-2 font-bold rounded-lg text-slate-400 transition";
-            document.getElementById('bankFriendPanel').style.display = tab==='friend' ? 'block' : 'none';
-            document.getElementById('bankSelfPanel').style.display = tab==='self' ? 'block' : 'none';
-            if(tab==='friend') document.getElementById('bankMode').value='ACC_SENT';
-            else document.getElementById('bankMode').value='TRF_WDL';
-        };
+        window.setSource = (val, btn) => {
+            document.getElementById('inpSource').value = val;
+            const btns = btn.parentElement.querySelectorAll('button');
+            btns.forEach(b => b.className = "flex-1 py-3 font-bold rounded-lg text-slate-400 transition");
+            btn.className = "flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition";
+        }
 
         window.setBankMode = (mode, btn) => {
             document.getElementById('bankMode').value = mode;
@@ -415,29 +437,53 @@
         function submitForm() {
             const amt = parseInt(document.getElementById('inpAmt').value);
             const desc = document.getElementById('inpDesc').value || 'Transaction';
-            const tax = document.getElementById('inpTax') ? parseInt(document.getElementById('inpTax').value) : 0;
+            const source = document.getElementById('inpSource') ? document.getElementById('inpSource').value : 'CASH';
             if (!amt) return alert("Please enter amount");
             
             const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
 
-            if(currentFormType === 'expense') appData.trans.push({ date, type: 'EXPENSE', amt, desc, person: 'Self' });
+            if(currentFormType === 'expense') appData.trans.push({ date, type: 'EXPENSE', amt, desc, person: 'Self', source });
             else if(currentFormType === 'credit') appData.trans.push({ date, type: 'RECEIVED', amt, desc, person: document.getElementById('inpPerson').value });
             else if(currentFormType === 'debit') appData.trans.push({ date, type: 'DEBIT', amt, desc, person: document.getElementById('inpPerson').value });
             else if(currentFormType === 'split') {
                 const friends = Array.from(document.querySelectorAll('.split-check:checked')).map(c => c.value);
                 if(!friends.length) return alert("Select friends");
                 const share = Math.round(amt / (friends.length + 1));
-                appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self' });
-                appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self' });
+                appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source }); // Deducts total from source
+                appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self' }); // Adds to weekly exp
                 friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p }));
             }
             else if(currentFormType === 'account') {
                 const mode = document.getElementById('bankMode').value;
-                const pInput = document.getElementById('inpPerson');
-                const person = pInput ? pInput.value : 'Self'; 
-                appData.trans.push({ date, type: mode, amt, desc, person, tax });
+                appData.trans.push({ date, type: mode, amt, desc, person: document.getElementById('inpPerson').value, source: 'BANK' });
             }
             saveData(); closeModal();
+        }
+
+        // --- VIEWS & HELPERS ---
+        function showAllHistory() {
+            document.getElementById('modal-history').classList.add('active');
+            renderTransList([...appData.trans].reverse(), 'fullHistoryList');
+        }
+
+        function showWeekDetails() {
+            document.getElementById('modal-week').classList.add('active');
+            const el = document.getElementById('weekDetailList');
+            el.innerHTML = '';
+            
+            const weekTrans = [...appData.trans].reverse().filter(t => !t.weekReset && (t.type === 'EXPENSE' || t.type === 'SPLIT_SHARE' || (t.type==='ACC_SENT' && t.person==='Self')));
+            
+            weekTrans.forEach(t => {
+                el.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-slate-700 text-sm">${t.desc}</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">${t.date}</p>
+                        </div>
+                        <span class="font-bold text-slate-800">${parseInt(t.amt).toLocaleString()}</span>
+                    </div>`;
+            });
+            if(weekTrans.length === 0) el.innerHTML = `<div class="text-center text-slate-400 p-8">No expenses this week.</div>`;
         }
 
         function openLedger(name) {
@@ -445,27 +491,73 @@
             document.getElementById('ledgerName').innerText = name;
             const tbody = document.getElementById('ledgerTableBody'); tbody.innerHTML = '';
             let bal = 0;
-            appData.trans.forEach(t => {
-                if(t.person === name) {
-                    let d = '', c = '', impact = 0;
-                    if(['DEBIT', 'ACC_SENT', 'SPLIT_DEBIT'].includes(t.type)) { d = parseInt(t.amt).toLocaleString(); impact = parseInt(t.amt); }
-                    if(['RECEIVED', 'ACC_RECV'].includes(t.type)) { c = parseInt(t.amt).toLocaleString(); impact = -parseInt(t.amt); }
-                    if(d || c) {
-                        bal += impact;
-                        tbody.innerHTML += `<tr><td class="p-4 border-b border-slate-50"><div class="font-bold text-slate-700">${t.desc}</div><div class="text-xs text-slate-400">${t.date}</div></td><td class="p-4 border-b border-slate-50 text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b border-slate-50 text-right text-green-600 font-bold">${c}</td></tr>`;
-                    }
+            // Filter then Reverse
+            const personTrans = appData.trans.filter(t => t.person === name).reverse();
+            
+            personTrans.forEach(t => {
+                let d = '', c = '', impact = 0;
+                // Calculate impact based on original chronological order (complicated if we just sum)
+                // For display we just show list. Balance is global.
+                
+                if(['DEBIT', 'ACC_SENT', 'SPLIT_DEBIT'].includes(t.type)) { d = parseInt(t.amt).toLocaleString(); }
+                if(['RECEIVED', 'ACC_RECV'].includes(t.type)) { c = parseInt(t.amt).toLocaleString(); }
+                
+                if(d || c) {
+                    tbody.innerHTML += `<tr><td class="p-4 border-b border-slate-50"><div class="font-bold text-slate-700">${t.desc}</div><div class="text-xs text-slate-400">${t.date}</div></td><td class="p-4 border-b border-slate-50 text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b border-slate-50 text-right text-green-600 font-bold">${c}</td></tr>`;
                 }
             });
-            const color = bal >= 0 ? "text-green-600" : "text-red-500";
+            
+            // Get current global balance for footer
+            const currentBal = appData.people[name] || 0;
+            const color = currentBal >= 0 ? "text-green-600" : "text-red-500";
             document.getElementById('ledgerTotal').className = `text-2xl font-extrabold ${color}`;
-            document.getElementById('ledgerTotal').innerText = Math.abs(bal).toLocaleString();
+            document.getElementById('ledgerTotal').innerText = Math.abs(currentBal).toLocaleString();
+        }
+
+        // --- SETTINGS & RESETS ---
+        function showResetOptions() {
+            closeModal();
+            document.getElementById('modal-reset-opts').classList.add('active');
+        }
+
+        function resetWeekExpensesOnly() {
+            if(confirm('Reset Week Expense Counter to 0?')) {
+                appData.trans.forEach(t => { if(['EXPENSE', 'ACC_SENT', 'SPLIT_SHARE'].includes(t.type)) t.weekReset = true; });
+                saveData(); document.getElementById('modal-reset-opts').classList.remove('active');
+            }
+        }
+
+        function resetBalance(target) {
+            // Target is CASH or BANK
+            const currentBal = target === 'CASH' ? appData.cash : appData.bank;
+            if(currentBal === 0) return alert("Balance is already 0.");
+
+            const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
+            // If Positive (e.g. 500), we need to subtract 500 (OUT)
+            // If Negative (e.g. -200), we need to add 200 (IN)
+            const mode = currentBal > 0 ? 'OUT' : 'IN';
+            const amt = Math.abs(currentBal);
+
+            appData.trans.push({
+                date,
+                type: 'BALANCE_CORRECTION',
+                mode: mode,
+                amt: amt,
+                desc: 'Manual Balance Reset',
+                person: 'Self',
+                source: target
+            });
+            
+            saveData(); 
+            document.getElementById('modal-reset-opts').classList.remove('active');
+            alert(`${target} has been reset to 0.`);
         }
 
         function addPerson() { const name = document.getElementById('newPersonName').value; if(name) { appData.people[name] = 0; saveData(); closeModal(); } }
         function openSettings() { closeModal(); document.getElementById('modal-settings').classList.add('active'); }
         function openModal(id) { closeModal(); document.getElementById('modal-'+id).classList.add('active'); }
         function closeModal() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); }
-        function resetApp() { if(confirm("Start Fresh? ALL DATA WILL BE LOST.")) { localStorage.removeItem("splitifyData_v5"); location.reload(); } }
+        function resetApp() { if(confirm("Start Fresh? ALL DATA WILL BE LOST.")) { localStorage.removeItem("splitifyData_v6"); location.reload(); } }
         function downloadData() { const a = document.createElement("a"); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData)); a.download = "splitify_backup.json"; a.click(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); saveData(); alert("Data Restored!"); closeModal(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
     </script>
