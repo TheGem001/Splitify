@@ -16,10 +16,17 @@
         .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 50; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .tag-card { transition: all 0.2s; border: 2px solid transparent; }
+        .tag-card.selected { border-color: #2563eb; background-color: #eff6ff; }
+        .tag-card.selected .check-circle { background-color: #2563eb; border-color: #2563eb; }
+        .tag-card.selected .check-circle i { opacity: 1; }
+        
         @media print { .no-print { display: none !important; } body { background-color: white; } }
     </style>
 </head>
@@ -37,7 +44,7 @@
                 <button onclick="openSettings()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"><i class="fa-solid fa-gear text-sm"></i></button>
             </div>
 
-            <!-- CLICKABLE BALANCE CARDS -->
+            <!-- CARDS -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div onclick="openAccountLedger('CASH')" class="bg-blue-700/50 p-4 rounded-2xl border border-blue-500/30 backdrop-blur-sm active:scale-95 transition cursor-pointer">
                     <div class="flex justify-between items-start"><p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mb-1">Cash in Hand</p><i class="fa-solid fa-chevron-right text-[10px] text-blue-300"></i></div>
@@ -50,9 +57,12 @@
             </div>
 
             <div class="flex justify-between px-2 text-xs font-medium text-blue-100">
-                <div onclick="showWeekDetails()" class="cursor-pointer active:opacity-70 transition"><span class="w-2 h-2 inline-block bg-white rounded-full mr-1"></span>Week Exp: <span id="dispWeek" class="text-white font-bold">0</span></div>
-                <div><span class="text-green-300">Get:</span> <span id="dispRecv" class="text-white font-bold">0</span></div>
-                <div><span class="text-red-300">Give:</span> <span id="dispPay" class="text-white font-bold">0</span></div>
+                <!-- Fixed Click Handler -->
+                <div onclick="showWeekDetails()" class="cursor-pointer active:opacity-70 transition p-1 -ml-1 rounded hover:bg-blue-500/20">
+                    <span class="w-2 h-2 inline-block bg-white rounded-full mr-1"></span>Week Exp: <span id="dispWeek" class="text-white font-bold">0</span>
+                </div>
+                <div class="p-1">Get: <span id="dispRecv" class="text-white font-bold">0</span></div>
+                <div class="p-1">Give: <span id="dispPay" class="text-white font-bold">0</span></div>
             </div>
         </div>
     </div>
@@ -80,7 +90,7 @@
         <!-- Attribution -->
         <div class="text-center pb-4 pt-4">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Created By</p>
-            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v8.0</span></p>
+            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v8.1</span></p>
         </div>
     </div>
 
@@ -100,8 +110,8 @@
         </button>
     </div>
 
-    <!-- MODALS -->
-    
+    <!-- ================= MODALS ================= -->
+
     <!-- ONBOARDING -->
     <div id="modal-onboarding" class="modal-overlay fixed inset-0 bg-blue-600 z-[90] flex flex-col items-center justify-center p-8 text-white text-center">
         <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6 backdrop-blur-xl shadow-xl"><i class="fa-solid fa-wallet text-4xl"></i></div>
@@ -111,7 +121,7 @@
         <button onclick="finishOnboarding()" class="w-full max-w-xs bg-white text-blue-600 font-bold py-4 rounded-xl shadow-lg">Get Started</button>
     </div>
 
-    <!-- FORM MODAL (With Tags) -->
+    <!-- FORM MODAL -->
     <div id="modal-form" class="modal-overlay fixed inset-0 bg-black/60 flex flex-col justify-end backdrop-blur-sm">
         <div class="modal-content bg-white w-full rounded-t-[2rem] h-[95vh] flex flex-col shadow-2xl">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-[2rem]">
@@ -126,33 +136,7 @@
         </div>
     </div>
 
-    <!-- TAGS MANAGEMENT MODAL -->
-    <div id="modal-tags" class="modal-overlay fixed inset-0 bg-white z-[70] flex flex-col">
-        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
-            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 class="font-bold text-lg">Manage Tags</h3>
-            <button onclick="addNewTagRoot()" class="text-blue-600 font-bold text-sm">+ New</button>
-        </div>
-        <div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="tagsListContainer"></div>
-    </div>
-
-    <!-- ACCOUNT LEDGER -->
-    <div id="modal-account-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
-        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
-            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 id="accLedgerTitle" class="font-bold text-lg">Account Ledger</h3>
-            <div class="w-10"></div>
-        </div>
-        <div id="accLedgerHeader" class="p-6 bg-blue-600 text-white">
-            <p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Current Balance</p>
-            <p class="text-3xl font-extrabold mt-1" id="accLedgerBalance">0</p>
-        </div>
-        <div class="flex-1 overflow-y-auto bg-slate-50">
-            <table class="w-full text-left text-sm border-collapse"><tbody id="accLedgerBody" class="divide-y divide-slate-100 bg-white"></tbody></table>
-        </div>
-    </div>
-
-    <!-- NEW REPORT MODAL (Graphs) -->
+    <!-- REPORT MODAL -->
     <div id="modal-report" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
         <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
             <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
@@ -171,9 +155,13 @@
             <button onclick="generateReport()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg">Generate Analysis</button>
             
             <div id="reportOutput" class="hidden space-y-4 mt-4">
+                <!-- Fallback Message -->
+                <div id="chartError" class="hidden p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm">Graph unavailable offline</div>
                 <div class="bg-white p-4 rounded-xl shadow-sm">
                     <h4 class="font-bold text-slate-700 mb-4 text-center">Expense by Category</h4>
-                    <canvas id="expenseChart"></canvas>
+                    <div style="max-height: 250px; display: flex; justify-content: center;">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm">
                     <h4 class="font-bold text-slate-700 mb-2">Details</h4>
@@ -183,66 +171,45 @@
         </div>
     </div>
 
-    <!-- SETTINGS -->
-    <div id="modal-settings" class="modal-overlay fixed inset-0 bg-black/60 z-[70] flex items-center justify-center px-6 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-            <h3 class="font-bold text-xl mb-6 text-slate-800">Settings</h3>
-            <div class="space-y-3">
-                <button onclick="changeName()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-id-card text-blue-500"></i> Change Name</button>
-                <button onclick="openTagsManager()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-tags text-pink-500"></i> Manage Tags</button>
-                <button onclick="openEditFriends()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-user-group text-purple-500"></i> Edit Friends</button>
-                <button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-blue-500"></i> Backup Data</button>
-                <label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-slate-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label>
-                <button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button>
-                <button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button>
-            </div>
-            <button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button>
+    <!-- WEEK DETAILS MODAL (Missing in previous version causing non-response) -->
+    <div id="modal-week" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 class="font-bold text-lg">Week Details</h3>
+            <div class="w-10"></div>
         </div>
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div>
     </div>
 
-    <!-- MENU -->
-    <div id="modal-menu" class="modal-overlay fixed inset-0 bg-black/60 flex flex-col justify-end backdrop-blur-sm" onclick="if(event.target===this) closeModal()">
-        <div class="modal-content bg-white w-full rounded-t-[2rem] p-6 pb-safe shadow-2xl">
-            <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <button onclick="openForm('cash_transfer')" class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-money-bill-transfer text-2xl text-emerald-600"></i><span class="font-bold text-emerald-800">Cash Transfer</span></button>
-                <button onclick="openForm('bank_transfer')" class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-building-columns text-2xl text-blue-600"></i><span class="font-bold text-blue-800">Bank Transfer</span></button>
-            </div>
-            <button onclick="openReportModal()" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center gap-3 font-bold text-slate-700 active:scale-95 transition"><i class="fa-solid fa-chart-pie text-purple-500"></i> Analytics & Reports</button>
-        </div>
-    </div>
-
-    <!-- OTHER MODALS (Ledger, History, etc. - Minimal changes) -->
-    <div id="modal-edit-friends" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
-        <div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Manage Friends</h3><div class="w-10"></div></div>
-        <div class="p-4 bg-white border-b"><button onclick="openModal('addPerson')" class="w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">+ Add New Friend</button></div>
-        <div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="editFriendsList"></div>
-    </div>
+    <!-- SETTINGS & OTHER MODALS -->
+    <div id="modal-settings" class="modal-overlay fixed inset-0 bg-black/60 z-[70] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-xl mb-6 text-slate-800">Settings</h3><div class="space-y-3"><button onclick="changeName()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-id-card text-blue-500"></i> Change Name</button><button onclick="openTagsManager()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-tags text-pink-500"></i> Manage Tags</button><button onclick="openEditFriends()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-user-group text-purple-500"></i> Edit Friends</button><button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-slate-500"></i> Backup Data</button><label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-slate-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label><button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button><button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button></div><button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button></div></div>
+    <div id="modal-menu" class="modal-overlay fixed inset-0 bg-black/60 flex flex-col justify-end backdrop-blur-sm" onclick="if(event.target===this) closeModal()"><div class="modal-content bg-white w-full rounded-t-[2rem] p-6 pb-safe shadow-2xl"><div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div><div class="grid grid-cols-2 gap-4 mb-4"><button onclick="openForm('cash_transfer')" class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-money-bill-transfer text-2xl text-emerald-600"></i><span class="font-bold text-emerald-800">Cash Transfer</span></button><button onclick="openForm('bank_transfer')" class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-building-columns text-2xl text-blue-600"></i><span class="font-bold text-blue-800">Bank Transfer</span></button></div><button onclick="openReportModal()" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center gap-3 font-bold text-slate-700 active:scale-95 transition"><i class="fa-solid fa-chart-pie text-purple-500"></i> Analytics & Reports</button></div></div>
+    
+    <!-- TAGS & LEDGERS -->
+    <div id="modal-tags" class="modal-overlay fixed inset-0 bg-white z-[70] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Manage Tags</h3><button onclick="addNewTagRoot()" class="text-blue-600 font-bold text-sm">+ New</button></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="tagsListContainer"></div></div>
+    <div id="modal-edit-friends" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Manage Friends</h3><div class="w-10"></div></div><div class="p-4 bg-white border-b"><button onclick="openModal('addPerson')" class="w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">+ Add New Friend</button></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="editFriendsList"></div></div>
+    <div id="modal-account-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 id="accLedgerTitle" class="font-bold text-lg">Account Ledger</h3><div class="w-10"></div></div><div id="accLedgerHeader" class="p-6 bg-blue-600 text-white"><p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Current Balance</p><p class="text-3xl font-extrabold mt-1" id="accLedgerBalance">0</p></div><div class="flex-1 overflow-y-auto bg-slate-50"><table class="w-full text-left text-sm border-collapse"><tbody id="accLedgerBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div></div>
     <div id="modal-all-friends" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">All Friends</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="allFriendsList"></div></div>
     <div id="modal-history" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">All Transactions</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="fullHistoryList"></div></div>
-    <div id="modal-week" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Week Details</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div></div>
     <div id="modal-addPerson" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-xl mb-1 text-slate-800">New Friend</h3><input type="text" id="newPersonName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-lg outline-none focus:border-blue-500 transition mb-6" placeholder="Name"><div class="flex gap-3"><button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold rounded-xl hover:bg-slate-50">Done</button><button onclick="addPerson()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">Add</button></div></div></div>
     <div id="modal-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 id="ledgerName" class="font-bold text-lg">Details</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50"><table class="w-full text-left text-sm border-collapse"><tbody id="ledgerTableBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div><div class="p-6 border-t bg-white safe-pb"><div class="flex justify-between items-center"><span class="text-slate-500 font-bold">Net Balance</span><span id="ledgerTotal" class="text-2xl font-extrabold">0</span></div></div></div>
     <div id="modal-reset-opts" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-slate-800">What to reset?</h3><div class="space-y-2"><button onclick="resetWeekExpensesOnly()" class="w-full p-3 bg-blue-50 text-blue-700 rounded-xl font-bold">Reset Expenses Only</button><button onclick="resetBalance('CASH')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Cash to 0</button><button onclick="resetBalance('BANK')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Bank to 0</button></div><button onclick="closeModal()" class="w-full py-3 mt-2 text-slate-400 font-bold">Cancel</button></div></div>
 
     <!-- LOGIC -->
     <script>
-        const APP_VERSION = '8.0'; 
+        const APP_VERSION = '8.1'; 
         const STORAGE_KEY = 'splitifyData_v8';
         let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [], tags: { 'Food': [], 'Transport': [], 'Bills': [] }, userName: 'User' };
         let currentFormType = '', editTransIndex = -1;
         let chartInstance = null;
+        let selectedTag = '';
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
 
         window.onload = () => {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) { appData = JSON.parse(saved); if(!appData.tags) appData.tags = { 'Food': [], 'Transport': [] }; } 
-            else {
-                const old = localStorage.getItem('splitifyData_v7_1');
-                if(old) { appData = JSON.parse(old); appData.tags = { 'Food': [], 'Transport': [] }; saveData(); }
-                else openOnboarding();
-            }
+            else { const old = localStorage.getItem('splitifyData_v7_1'); if(old) { appData = JSON.parse(old); appData.tags = { 'Food': [], 'Transport': [] }; saveData(); } else openOnboarding(); }
             recalculate(); updateWelcome();
             window.onpopstate = () => document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
         };
@@ -253,8 +220,7 @@
 
         // --- MATH ---
         function recalculate() {
-            let c=0, b=0, w=0, pBal={}; 
-            for(let k in appData.people) pBal[k]=0;
+            let c=0, b=0, w=0, pBal={}; for(let k in appData.people) pBal[k]=0;
             appData.trans.forEach(t => {
                 const amt=parseInt(t.amt)||0, p=t.person, isBank=t.source==='BANK', isCur=!t.weekReset;
                 if(p && p!=='Self' && pBal[p]===undefined) pBal[p]=0;
@@ -284,46 +250,55 @@
             const list=document.getElementById('peopleList'); list.innerHTML='';
             const sorted=[...Object.entries(appData.people).filter(x=>x[1]<0).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])), ...Object.entries(appData.people).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1])];
             
-            if(sorted.length===0) { 
-                list.innerHTML=`<div class="p-8 text-center text-slate-400 font-medium cursor-pointer" onclick="openSettings()">No active friends.<br><span class="text-blue-500 text-xs font-bold mt-2 inline-block"><i class="fa-solid fa-gear"></i> Go to Settings to Add</span></div>`; 
-            } else {
-                sorted.forEach(([n,b])=>{
-                    const c=b>=0?'text-green-600':'text-red-500', l=b>=0?'OWES YOU':'YOU OWE', bg=b>=0?'bg-green-50 text-green-600':'bg-red-50 text-red-500';
-                    list.innerHTML+=`<div onclick="openLedger('${n}')" class="flex justify-between items-center p-4 hover:bg-slate-50 active:bg-slate-100 transition"><div class="flex items-center gap-4 pointer-events-none"><div class="w-12 h-12 rounded-full ${bg} flex items-center justify-center font-bold shadow-sm">${n[0]}</div><div><p class="font-bold text-slate-800">${n}</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1">${l}</p></div></div><div class="flex items-center gap-3 pointer-events-none"><p class="font-extrabold ${c}">${Math.abs(b).toLocaleString()}</p><i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i></div></div>`;
-                });
-            }
+            if(sorted.length===0) list.innerHTML=`<div class="p-8 text-center text-slate-400 font-medium cursor-pointer" onclick="openSettings()">No active friends.<br><span class="text-blue-500 text-xs font-bold mt-2 inline-block"><i class="fa-solid fa-gear"></i> Go to Settings to Add</span></div>`; 
+            else sorted.forEach(([n,b])=>{ const c=b>=0?'text-green-600':'text-red-500', l=b>=0?'OWES YOU':'YOU OWE', bg=b>=0?'bg-green-50 text-green-600':'bg-red-50 text-red-500'; list.innerHTML+=`<div onclick="openLedger('${n}')" class="flex justify-between items-center p-4 hover:bg-slate-50 active:bg-slate-100 transition"><div class="flex items-center gap-4 pointer-events-none"><div class="w-12 h-12 rounded-full ${bg} flex items-center justify-center font-bold shadow-sm">${n[0]}</div><div><p class="font-bold text-slate-800">${n}</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1">${l}</p></div></div><div class="flex items-center gap-3 pointer-events-none"><p class="font-extrabold ${c}">${Math.abs(b).toLocaleString()}</p><i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i></div></div>`; });
             renderTransList([...appData.trans].reverse().slice(0,3), 'transList');
         }
 
-        // --- TAG SYSTEM ---
-        function openTagsManager() { openModal('tags'); renderTagsList(); }
-        function renderTagsList() {
-            const el = document.getElementById('tagsListContainer'); el.innerHTML = '';
-            Object.keys(appData.tags).forEach(tag => {
-                let subHtml = appData.tags[tag].map(s => `<span class="bg-slate-100 px-2 py-1 rounded text-xs mr-1">${s}</span>`).join('');
-                el.innerHTML += `<div class="bg-white p-3 rounded-xl border mb-2"><div class="flex justify-between"><span class="font-bold">${tag}</span><button onclick="addSubTag('${tag}')" class="text-xs text-blue-500">+ Sub</button></div><div class="mt-2 flex flex-wrap gap-1">${subHtml}</div></div>`;
+        // --- TAG SYSTEM UI ---
+        function renderTagSelectionList(containerId) {
+            const container = document.getElementById(containerId);
+            let html = `<div><input type="text" placeholder="Search Tags..." class="w-full p-2 text-sm border rounded-lg mb-2" onkeyup="filterTags(this)"></div><div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto" id="tagGrid">`;
+            
+            // Flatten tags for display
+            let allTags = [];
+            Object.keys(appData.tags).forEach(main => {
+                allTags.push({val: main, label: main, isMain: true});
+                appData.tags[main].forEach(sub => allTags.push({val: `${main}:${sub}`, label: sub, isMain: false, parent: main}));
+            });
+
+            allTags.forEach(t => {
+                const display = t.isMain ? t.label : `${t.parent} > ${t.label}`;
+                const style = t.isMain ? 'font-bold' : 'text-xs text-slate-600';
+                html += `
+                <div onclick="selectTagUI(this, '${t.val}')" class="tag-card flex items-center justify-between p-3 border rounded-xl bg-white cursor-pointer" data-tag="${t.val.toLowerCase()}">
+                    <span class="${style}">${t.label}</span>
+                    <div class="check-circle w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-check text-white text-[10px] opacity-0 transition"></i></div>
+                </div>`;
+            });
+            container.innerHTML = html + '</div>';
+        }
+
+        function selectTagUI(el, val) {
+            document.querySelectorAll('.tag-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTag = val;
+        }
+
+        function filterTags(input) {
+            const filter = input.value.toLowerCase();
+            document.querySelectorAll('.tag-card').forEach(el => {
+                const tagVal = el.getAttribute('data-tag');
+                el.style.display = tagVal.includes(filter) ? 'flex' : 'none';
             });
         }
-        function addNewTagRoot() { const n = prompt("Main Tag Name:"); if(n && !appData.tags[n]) { appData.tags[n]=[]; saveData(); renderTagsList(); } }
-        function addSubTag(root) { const n = prompt("Sub-tag Name:"); if(n) { appData.tags[root].push(n); saveData(); renderTagsList(); } }
 
         // --- FORMS ---
-        function openForm(type) { currentFormType=type; editTransIndex=-1; openModal('form'); renderFormContent(); }
+        function openForm(type) { currentFormType=type; editTransIndex=-1; selectedTag=''; openModal('form'); renderFormContent(); }
         function renderFormContent() {
             const content = document.getElementById('formContent');
             const title = document.getElementById('formTitle');
             const pOpts = Object.keys(appData.people).map(p=>`<option value="${p}">${p}</option>`).join('');
-            
-            // Tag Selector with Search
-            let tagOpts = `<option value="">Select Tag (Optional)</option>`;
-            Object.keys(appData.tags).forEach(t => {
-                tagOpts += `<option value="${t}">${t}</option>`;
-                appData.tags[t].forEach(s => tagOpts += `<option value="${t}:${s}">— ${s}</option>`);
-            });
-            const tagSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Category / Tag</label><select id="inpTag" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold mt-1 outline-none">${tagOpts}</select></div>`;
-
-            // Searchable Friend List (Simple implementation for now)
-            const personSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Person</label><select id="inpPerson" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold mt-1 outline-none"><option value="Self">Self / Home</option>${pOpts}</select></div>`;
             const amtInput = `<div><label class="text-xs font-bold text-slate-400 uppercase ml-1">Amount</label><div class="relative mt-1"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">Rs</span><input type="number" id="inpAmt" class="w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl font-bold text-2xl outline-none" placeholder="0"></div></div>`;
             const descInput = `<div class="mt-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Description</label><input type="text" id="inpDesc" class="w-full mt-1 p-4 bg-slate-50 border rounded-2xl font-bold outline-none" placeholder="Details..."></div>`;
 
@@ -331,29 +306,21 @@
                 title.innerText = "Add Expense";
                 const srcSel = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Paid From</label><div class="flex p-1 bg-slate-100 rounded-xl mt-1"><button onclick="setSource('CASH',this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600">Cash</button><button onclick="setSource('BANK',this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400">Bank</button></div><input type=\"hidden\" id=\"inpSource\" value=\"CASH\"></div>`;
                 const paidFor = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Paid For</label><select id="inpPerson" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold mt-1"><option value="Self">Myself</option>${pOpts}</select></div>`;
-                content.innerHTML = srcSel + paidFor + tagSelect + amtInput + descInput;
+                content.innerHTML = srcSel + paidFor + `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Select Tag</label><div id="tagContainer"></div></div>` + amtInput + descInput;
+                renderTagSelectionList('tagContainer');
             } else if(currentFormType==='split') {
                 title.innerText = "Split Bill";
                 let checks = `<div class="grid grid-cols-2 gap-3 mt-4 overflow-y-auto max-h-40">`; 
-                // Recent friends logic could go here, for now alphabetical
                 Object.keys(appData.people).sort().forEach(p => checks += `<label class="flex items-center gap-3 p-3 border rounded-xl bg-slate-50 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500"><input type="checkbox" class="w-5 h-5 accent-blue-600 rounded split-check" value="${p}"><span class="font-bold text-sm">${p}</span></label>`);
                 checks += `</div>`;
                 const srcSel = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Paid From</label><div class="flex p-1 bg-slate-100 rounded-xl mt-1"><button onclick="setSource('CASH',this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600">Cash</button><button onclick="setSource('BANK',this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400">Bank</button></div><input type=\"hidden\" id=\"inpSource\" value=\"CASH\"></div>`;
-                content.innerHTML = srcSel + tagSelect + amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase ml-1 mt-4 block">Split With</label><input type="text" placeholder="Search friend..." class="w-full p-2 text-sm border rounded-lg mb-2" onkeyup="filterSplitFriends(this)">${checks}</div>`;
+                content.innerHTML = srcSel + `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Select Tag</label><div id="tagContainer"></div></div>` + amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase ml-1 mt-4 block">Split With</label>${checks}</div>`;
+                renderTagSelectionList('tagContainer');
             } else {
                 title.innerText = currentFormType.replace('_',' ').toUpperCase();
+                const personSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase ml-1">Person</label><select id="inpPerson" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold mt-1 outline-none"><option value="Self">Self / Home</option>${pOpts}</select></div>`;
                 content.innerHTML = `<div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4"><button onclick="setTransferMode('GIVE')" id="btnGive" class="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100">Give</button><button onclick="setTransferMode('REC')" id="btnRec" class="text-slate-400 py-2 rounded-lg font-bold">Received</button></div><input type="hidden" id="transferMode" value="GIVE">${personSelect} ${amtInput} ${descInput}`;
             }
-        }
-
-        // --- FILTER HELPERS ---
-        function filterSplitFriends(input) {
-            const filter = input.value.toLowerCase();
-            document.querySelectorAll('.split-check').forEach(el => {
-                const label = el.parentElement;
-                const name = el.value.toLowerCase();
-                label.style.display = name.includes(filter) ? 'flex' : 'none';
-            });
         }
 
         function submitForm() {
@@ -366,18 +333,16 @@
             if(currentFormType === 'expense') { 
                 const source = document.getElementById('inpSource').value; 
                 const person = document.getElementById('inpPerson').value; 
-                const tag = document.getElementById('inpTag').value;
-                appData.trans.push({ date, type: 'EXPENSE', amt, desc, person, source, tag }); 
+                appData.trans.push({ date, type: 'EXPENSE', amt, desc, person, source, tag: selectedTag }); 
             }
             else if(currentFormType === 'split') {
                 const source = document.getElementById('inpSource').value; 
-                const tag = document.getElementById('inpTag').value;
                 const friends = Array.from(document.querySelectorAll('.split-check:checked')).map(c => c.value);
                 if(!friends.length) return alert("Select friends");
                 const share = Math.round(amt / (friends.length + 1));
-                appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source, tag });
-                appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self', tag });
-                friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p, tag }));
+                appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source, tag: selectedTag });
+                appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self', tag: selectedTag });
+                friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p, tag: selectedTag }));
             }
             else { // Transfers
                 const mode = document.getElementById('transferMode').value;
@@ -389,7 +354,7 @@
             saveData(); closeModal();
         }
 
-        // --- NEW REPORTS WITH GRAPHS ---
+        // --- REPORT FIX ---
         function generateReport() {
             const from = new Date(document.getElementById('repFrom').value);
             const to = new Date(document.getElementById('repTo').value);
@@ -397,8 +362,7 @@
             
             document.getElementById('reportOutput').classList.remove('hidden');
             const tbody = document.getElementById('repBody'); tbody.innerHTML = '';
-            let total = 0;
-            let tagData = {};
+            let total = 0, tagData = {};
 
             const filtered = appData.trans.filter(t => {
                 const dParts = t.date.split(' '); const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}; const tDate = new Date(new Date().getFullYear(), months[dParts[1]], parseInt(dParts[0]));
@@ -407,32 +371,31 @@
 
             filtered.forEach(t => {
                 total += parseInt(t.amt);
-                // Aggregation Logic
                 let mainTag = t.tag ? t.tag.split(':')[0] : 'Uncategorized';
-                if(!tagData[mainTag]) tagData[mainTag] = 0;
-                tagData[mainTag] += parseInt(t.amt);
-                
+                if(!tagData[mainTag]) tagData[mainTag] = 0; tagData[mainTag] += parseInt(t.amt);
                 tbody.innerHTML += `<tr><td class="py-2 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date} ${t.tag ? '• '+t.tag.replace(':',' > ') : ''}</div></td><td class="py-2 border-b text-right font-mono">${t.amt}</td></tr>`;
             });
             document.getElementById('repTotal').innerText = total.toLocaleString();
 
-            // Render Chart
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(tagData),
-                    datasets: [{
-                        data: Object.values(tagData),
-                        backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#6366f1']
-                    }]
-                },
-                options: { plugins: { legend: { position: 'bottom' } } }
-            });
+            // CHART SAFETY CHECK
+            if(typeof Chart === 'undefined') {
+                document.getElementById('chartError').classList.remove('hidden');
+            } else {
+                document.getElementById('chartError').classList.add('hidden');
+                const ctx = document.getElementById('expenseChart').getContext('2d');
+                if(chartInstance) chartInstance.destroy();
+                chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(tagData),
+                        datasets: [{ data: Object.values(tagData), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#6366f1'] }]
+                    },
+                    options: { plugins: { legend: { position: 'bottom' } } }
+                });
+            }
         }
 
-        // --- UTILS ---
+        // Shared Utils
         function renderTransList(arr, elId) {
             const el = document.getElementById(elId); el.innerHTML = '';
             arr.forEach((t) => {
@@ -441,34 +404,38 @@
                 if(t.type.includes('EXPENSE')) { icon='fa-arrow-trend-down'; color='bg-red-100 text-red-500'; }
                 else if(['RECEIVED','ACC_RECV','TRANSFER_IN'].includes(t.type)) { icon='fa-arrow-down'; color='bg-green-100 text-green-500'; }
                 else if(['DEBIT','ACC_SENT','TRANSFER_OUT'].includes(t.type)) { icon='fa-arrow-up'; color='bg-orange-100 text-orange-500'; }
-                
                 let tagBadge = t.tag ? `<span class="text-[9px] bg-slate-200 px-1 rounded ml-1 text-slate-600">${t.tag.split(':')[0]}</span>` : '';
-                
                 el.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm"><div class="flex items-center gap-3 overflow-hidden"><div class="w-10 h-10 rounded-full ${color} flex items-center justify-center shrink-0"><i class="fa-solid ${icon}"></i></div><div class="min-w-0"><p class="font-bold text-slate-700 truncate text-sm flex items-center">${t.desc} ${tagBadge}</p><p class="text-[10px] text-slate-400 font-bold uppercase">${t.date} • ${t.person||'Self'}</p></div></div><div class="flex items-center gap-2 pl-2"><span class="font-bold text-slate-800">${parseInt(t.amt).toLocaleString()}</span><button onclick="if(confirm('Delete?')){appData.trans.splice(${realIndex},1);saveData();renderUI();}" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button></div></div>`;
             });
         }
-
-        // Shared
         function openSettings() { openModal('settings'); }
         function openOnboarding() { document.getElementById('modal-onboarding').classList.add('active'); }
         function finishOnboarding() { const n=document.getElementById('setupName').value; if(n){appData.userName=n; saveData(); document.getElementById('modal-onboarding').classList.remove('active'); updateWelcome();} }
         function updateWelcome() { document.getElementById('welcomeUser').innerText = "Hello, "+appData.userName; }
         function changeName() { const n=prompt("Name:",appData.userName); if(n){appData.userName=n;saveData();updateWelcome();closeModal();} }
-        
         function openAccountLedger(type) { openModal('account-ledger'); document.getElementById('accLedgerTitle').innerText=(type==='CASH'?"Cash":"Bank")+" Ledger"; document.getElementById('accLedgerBalance').innerText=(type==='CASH'?appData.cash:appData.bank).toLocaleString(); const tb=document.getElementById('accLedgerBody'); tb.innerHTML=''; appData.trans.filter(t=>(type==='BANK'?t.source==='BANK':t.source!=='BANK')).reverse().forEach(t=>{ let amt=parseInt(t.amt), c="text-green-600", s="+"; if(['EXPENSE','TRANSFER_OUT','DEBIT','SPLIT_MAIN','ACC_SENT','TRF_DEP'].includes(t.type) || (type==='BANK'&&t.type==='TRF_WDL')) { amt=-amt; c="text-red-500"; s=""; } tb.innerHTML+=`<tr><td class="p-4 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date}</div></td><td class="p-4 border-b text-right font-mono font-bold ${c}">${s}${Math.abs(amt)}</td></tr>`; }); }
-        
         function openAllFriendsModal() { openModal('all-friends'); document.getElementById('allFriendsList').innerHTML=Object.entries(appData.people).map(([n,b])=>`<div onclick="openLedger('${n}')" class="flex justify-between p-4 border rounded-xl mb-2"><span class="font-bold">${n}</span><span class="font-bold ${b>=0?'text-green-600':'text-red-500'}">${Math.abs(b)}</span></div>`).join(''); }
         function showAllHistory() { openModal('history'); renderTransList([...appData.trans].reverse(), 'fullHistoryList'); }
+        function showWeekDetails() { openModal('week'); renderTransList([...appData.trans].reverse().filter(t => !t.weekReset && (t.type==='EXPENSE' || t.type==='SPLIT_SHARE')), 'weekDetailList'); }
         function openLedger(name) { openModal('ledger'); document.getElementById('ledgerName').innerText=name; const tb=document.getElementById('ledgerTableBody'); tb.innerHTML=''; appData.trans.filter(t=>t.person===name).reverse().forEach(t=>{ let d='', c=''; if(['DEBIT','ACC_SENT','TRANSFER_OUT','SPLIT_DEBIT'].includes(t.type)) d=t.amt; if(['RECEIVED','ACC_RECV','TRANSFER_IN'].includes(t.type)) c=t.amt; if(t.type==='EXPENSE') d=t.amt; if(d||c) tb.innerHTML+=`<tr><td class="p-4 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date}</div></td><td class="p-4 border-b text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b text-right text-green-600 font-bold">${c}</td></tr>`; }); document.getElementById('ledgerTotal').innerText=Math.abs(appData.people[name]); }
-        
+        function openTagsManager() { openModal('tags'); renderTagsList(); }
+        function renderTagsList() { const el = document.getElementById('tagsListContainer'); el.innerHTML = ''; Object.keys(appData.tags).forEach(tag => { let subHtml = appData.tags[tag].map(s => `<span class="bg-slate-100 px-2 py-1 rounded text-xs mr-1">${s}</span>`).join(''); el.innerHTML += `<div class="bg-white p-3 rounded-xl border mb-2"><div class="flex justify-between"><span class="font-bold">${tag}</span><button onclick="addSubTag('${tag}')" class="text-xs text-blue-500">+ Sub</button></div><div class="mt-2 flex flex-wrap gap-1">${subHtml}</div></div>`; }); }
+        function addNewTagRoot() { const n = prompt("Main Tag Name:"); if(n && !appData.tags[n]) { appData.tags[n]=[]; saveData(); renderTagsList(); } }
+        function addSubTag(root) { const n = prompt("Sub-tag Name:"); if(n) { appData.tags[root].push(n); saveData(); renderTagsList(); } }
         function openEditFriends() { openModal('edit-friends'); const l=document.getElementById('editFriendsList'); l.innerHTML=''; Object.keys(appData.people).forEach(p=>{ l.innerHTML+=`<div class="flex justify-between p-3 border rounded-xl mb-2"><span class="font-bold">${p}</span><div class="flex gap-2"><button onclick="renameFriend('${p}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button><button onclick="deleteFriend('${p}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div></div>`; }); }
         function addPerson() { const n=document.getElementById('newPersonName').value; if(n){ appData.people[n]=0; saveData(); document.getElementById('newPersonName').value=''; alert("Added!"); } }
         function renameFriend(o) { const n=prompt("New Name:",o); if(n&&n!==o){appData.people[n]=appData.people[o]; delete appData.people[o]; appData.trans.forEach(t=>{if(t.person===o)t.person=n}); saveData(); openEditFriends();} }
         function deleteFriend(n) { if(confirm("Delete "+n+"?")) { delete appData.people[n]; appData.trans=appData.trans.filter(t=>t.person!==n); saveData(); openEditFriends(); } }
-        
         function setRepDate(r) { const d=new Date(), t=d.toISOString().split('T')[0]; if(r==='week'){const w=d.getDate()-d.getDay()+(d.getDay()===0?-6:1); d.setDate(w);} else d.setDate(1); document.getElementById('repFrom').value=d.toISOString().split('T')[0]; document.getElementById('repTo').value=t; }
         window.setSource=(v,b)=>{document.getElementById('inpSource').value=v; b.parentElement.querySelectorAll('button').forEach(x=>x.className="flex-1 py-3 font-bold rounded-lg text-slate-400"); b.className="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600";}
         window.setTransferMode=(m)=>{document.getElementById('transferMode').value=m; if(m==='GIVE'){document.getElementById('btnGive').className="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100";document.getElementById('btnRec').className="text-slate-400 py-2 rounded-lg font-bold";}else{document.getElementById('btnRec').className="bg-green-50 text-green-600 py-2 rounded-lg font-bold border border-green-100";document.getElementById('btnGive').className="text-slate-400 py-2 rounded-lg font-bold";}}
+        function openReportModal() { openModal('report'); setRepDate('month'); }
+        function showResetOptions() { openModal('reset-opts'); }
+        function resetWeekExpensesOnly() { if(confirm('Reset Week Expense Counter to 0?')) { appData.trans.forEach(t => { if(['EXPENSE','SPLIT_SHARE'].includes(t.type)) t.weekReset = true; }); saveData(); closeModal(); } }
+        function resetBalance(target) { const currentBal = target === 'CASH' ? appData.cash : appData.bank; if(currentBal === 0) return alert("Balance is already 0."); const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'}); const mode = currentBal > 0 ? 'OUT' : 'IN'; appData.trans.push({ date, type: 'BALANCE_CORRECTION', mode: mode, amt: Math.abs(currentBal), desc: 'Manual Reset', person: 'Self', source: target }); saveData(); closeModal(); alert(`${target} reset to 0.`); }
+        function resetApp() { if(confirm("Start Fresh? ALL DATA WILL BE LOST.")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+        function downloadData() { const a = document.createElement("a"); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData)); a.download = "splitify_backup.json"; a.click(); }
+        function importData(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); saveData(); alert("Data Restored!"); closeModal(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
     </script>
 </body>
 </html>

@@ -2,15 +2,43 @@
   "name": "Splitify",
   "short_name": "Splitify",
   "start_url": "./index.html",
+  "id": "/?source=pwa",
   "display": "standalone",
-  "background_color": "#2563eb",
-  "theme_color": "#5182ef",
-  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#2563eb",
+  "description": "The ultimate offline finance ledger for shared living. Track expenses, split bills, and manage debts with friends easily.",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
       "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home Screen"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Expense",
+      "short_name": "Expense",
+      "url": "./index.html?action=expense",
+      "icons": [{ "src": "icon.png", "sizes": "192x192" }]
     }
   ]
 }
