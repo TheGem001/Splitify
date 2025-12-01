@@ -16,34 +16,48 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Modal Transitions */
         .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 50; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .slide-in { animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media print { .no-print { display: none !important; } body { background-color: white; } }
     </style>
 </head>
 <body class="h-screen flex flex-col text-slate-800 overflow-hidden bg-slate-50">
 
     <!-- HEADER -->
-    <div class="bg-blue-600 text-white p-6 pt-12 pb-10 rounded-b-[2.5rem] shadow-xl z-10 shrink-0 relative overflow-hidden">
+    <div class="bg-blue-600 text-white p-6 pt-12 pb-10 rounded-b-[2.5rem] shadow-xl z-10 shrink-0 relative overflow-hidden no-print">
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16"></div>
         <div class="relative z-10">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-md"><i class="fa-solid fa-wallet text-sm"></i></div>
-                    <h1 class="text-xl font-extrabold tracking-tight">Splitify</h1>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tight leading-none">Splitify</h1>
+                        <p class="text-[10px] text-blue-200 font-medium leading-none mt-1" id="welcomeUser">Welcome</p>
+                    </div>
                 </div>
                 <button onclick="openSettings()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"><i class="fa-solid fa-gear text-sm"></i></button>
             </div>
 
+            <!-- CLICKABLE BALANCE CARDS -->
             <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="bg-blue-700/50 p-4 rounded-2xl border border-blue-500/30 backdrop-blur-sm">
-                    <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mb-1">Cash in Hand</p>
+                <div onclick="openAccountLedger('CASH')" class="bg-blue-700/50 p-4 rounded-2xl border border-blue-500/30 backdrop-blur-sm active:scale-95 transition cursor-pointer">
+                    <div class="flex justify-between items-start">
+                        <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mb-1">Cash in Hand</p>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-blue-300"></i>
+                    </div>
                     <p class="text-2xl font-bold truncate" id="dispCash">0</p>
                 </div>
-                <div class="bg-blue-700/50 p-4 rounded-2xl border border-blue-500/30 backdrop-blur-sm">
-                    <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mb-1">Bank Account</p>
+                <div onclick="openAccountLedger('BANK')" class="bg-blue-700/50 p-4 rounded-2xl border border-blue-500/30 backdrop-blur-sm active:scale-95 transition cursor-pointer">
+                    <div class="flex justify-between items-start">
+                        <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mb-1">Bank Account</p>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-blue-300"></i>
+                    </div>
                     <p class="text-2xl font-bold truncate" id="dispBank">0</p>
                 </div>
             </div>
@@ -57,12 +71,11 @@
     </div>
 
     <!-- MAIN SCROLLABLE AREA -->
-    <div class="flex-1 overflow-y-auto -mt-6 pt-8 pb-32 px-4 space-y-5 z-0 no-scrollbar">
+    <div class="flex-1 overflow-y-auto -mt-6 pt-8 pb-32 px-4 space-y-5 z-0 no-scrollbar no-print">
         <!-- Friends Ledger -->
         <div>
             <div class="flex justify-between items-center px-1 mb-2">
                 <h2 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Friends Ledger</h2>
-                <!-- Button Changed to View All per request -->
                 <button onclick="openAllFriendsModal()" class="text-blue-600 text-xs font-bold bg-blue-50 px-3 py-1.5 rounded-full active:bg-blue-100 transition">View All</button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-50" id="peopleList"></div>
@@ -80,12 +93,12 @@
         <!-- Attribution Footer -->
         <div class="text-center pb-4 pt-4">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Created By</p>
-            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v7.1</span></p>
+            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v7.2</span></p>
         </div>
     </div>
 
     <!-- BOTTOM BAR -->
-    <div class="fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-xl p-2 rounded-[2rem] shadow-2xl border border-slate-200/50 flex justify-between items-center z-30">
+    <div class="fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-xl p-2 rounded-[2rem] shadow-2xl border border-slate-200/50 flex justify-between items-center z-30 no-print">
         <button onclick="openForm('expense')" class="flex-1 flex flex-col items-center py-2 rounded-[1.5rem] active:bg-slate-100 transition group">
             <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-1 group-active:scale-95 transition"><i class="fa-solid fa-receipt"></i></div>
             <span class="text-[10px] font-bold text-slate-500">Expense</span>
@@ -102,7 +115,21 @@
 
     <!-- ================= MODALS ================= -->
 
-    <!-- Form Modal -->
+    <!-- ONBOARDING MODAL -->
+    <div id="modal-onboarding" class="modal-overlay fixed inset-0 bg-blue-600 z-[90] flex flex-col items-center justify-center p-8 text-white text-center">
+        <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6 backdrop-blur-xl shadow-xl">
+            <i class="fa-solid fa-wallet text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-extrabold mb-2">Welcome to Splitify</h2>
+        <p class="text-blue-100 mb-8 max-w-xs leading-relaxed">Your personal finance ledger for shared living. Track cash, bank, and roommate debts offline.</p>
+        
+        <input type="text" id="setupName" class="w-full max-w-xs p-4 bg-white/10 border border-white/30 rounded-xl text-center text-white placeholder-blue-200 font-bold text-lg outline-none focus:bg-white/20 transition mb-6" placeholder="What's your name?">
+        
+        <button onclick="finishOnboarding()" class="w-full max-w-xs bg-white text-blue-600 font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Get Started</button>
+        <p class="text-[10px] text-blue-200 mt-6 opacity-60">Version 7.2</p>
+    </div>
+
+    <!-- FORM MODAL -->
     <div id="modal-form" class="modal-overlay fixed inset-0 bg-black/60 flex flex-col justify-end backdrop-blur-sm">
         <div class="modal-content bg-white w-full rounded-t-[2rem] h-[90vh] flex flex-col shadow-2xl">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-[2rem]">
@@ -113,6 +140,56 @@
             <div id="formContent" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
             <div class="p-6 border-t border-slate-100 bg-white pb-safe">
                 <button onclick="submitForm()" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-blue-200 active:scale-[0.98] transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCOUNT LEDGER MODAL (Cash/Bank) -->
+    <div id="modal-account-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 id="accLedgerTitle" class="font-bold text-lg">Account Ledger</h3>
+            <div class="w-10"></div>
+        </div>
+        <!-- Colorful Header -->
+        <div id="accLedgerHeader" class="p-6 bg-blue-600 text-white">
+            <p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Current Balance</p>
+            <p class="text-3xl font-extrabold mt-1" id="accLedgerBalance">0</p>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-slate-50">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead class="bg-slate-100 text-slate-500 text-xs uppercase sticky top-0">
+                    <tr><th class="p-4">Date / Desc</th><th class="p-4 text-right">Amount</th></tr>
+                </thead>
+                <tbody id="accLedgerBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- REPORT MODAL (Expenses Only) -->
+    <div id="modal-report" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 class="font-bold text-lg">Expense Report</h3>
+            <div class="w-10"></div>
+        </div>
+        <div class="p-6 space-y-4 bg-slate-50 flex-1 overflow-y-auto">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1">From</label><input type="date" id="repFrom" class="w-full p-3 rounded-xl border border-slate-200 mt-1"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1">To</label><input type="date" id="repTo" class="w-full p-3 rounded-xl border border-slate-200 mt-1"></div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="setRepDate('week')" class="flex-1 py-2 bg-white border rounded-lg text-xs font-bold text-slate-500">This Week</button>
+                <button onclick="setRepDate('month')" class="flex-1 py-2 bg-white border rounded-lg text-xs font-bold text-slate-500">This Month</button>
+            </div>
+            <button onclick="generateReport()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Generate Report</button>
+            <div id="reportOutput" class="bg-white rounded-xl shadow-sm p-4 mt-6 hidden slide-in">
+                <h2 class="text-center font-bold text-lg border-b pb-2 mb-2">Expense Summary</h2>
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase border-b"><tr><th class="pb-2">Details</th><th class="pb-2 text-right">Amount</th></tr></thead>
+                    <tbody id="repBody" class="divide-y"></tbody>
+                    <tfoot><tr><td class="pt-2 font-bold">Total Expenses</td><td class="pt-2 text-right font-bold text-red-500" id="repTotal">0</td></tr></tfoot>
+                </table>
             </div>
         </div>
     </div>
@@ -133,65 +210,29 @@
                 </button>
             </div>
             <button onclick="openReportModal()" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center gap-3 font-bold text-slate-700 active:scale-95 transition">
-                <i class="fa-solid fa-chart-pie"></i> Reports
+                <i class="fa-solid fa-chart-pie text-purple-500"></i> Expense Reports
             </button>
         </div>
     </div>
 
-    <!-- Reports Modal -->
-    <div id="modal-report" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
-        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
-            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 class="font-bold text-lg">Generate Report</h3>
-            <div class="w-10"></div>
-        </div>
-        <div class="p-6 space-y-4 bg-slate-50 flex-1 overflow-y-auto">
-            <div>
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">Report Type</label>
-                <select id="repType" class="w-full p-3 rounded-xl border border-slate-200 mt-1 font-bold" onchange="toggleRepPerson()">
-                    <option value="EXPENSE">Expense Report</option>
-                    <option value="CASH_LEDGER">Cash Ledger</option>
-                    <option value="BANK_LEDGER">Bank Ledger</option>
-                    <option value="INDIVIDUAL">Individual Person Ledger</option>
-                </select>
+    <!-- Settings & Other Modals -->
+    <div id="modal-settings" class="modal-overlay fixed inset-0 bg-black/60 z-[70] flex items-center justify-center px-6 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 class="font-bold text-xl mb-6 text-slate-800">Settings</h3>
+            <div class="space-y-3">
+                <button onclick="changeName()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-id-card text-blue-500"></i> Change Your Name</button>
+                <button onclick="openOnboarding(true)" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-circle-question text-green-500"></i> Help / Tutorial</button>
+                <button onclick="openEditFriends()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-user-group text-purple-500"></i> Edit Friends</button>
+                <button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-slate-500"></i> Backup Data</button>
+                <label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-slate-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label>
+                <button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button>
+                <button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button>
             </div>
-            <div id="repPersonDiv" class="hidden">
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">Select Person</label>
-                <select id="repPerson" class="w-full p-3 rounded-xl border border-slate-200 mt-1 font-bold"></select>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">From</label>
-                    <input type="date" id="repFrom" class="w-full p-3 rounded-xl border border-slate-200 mt-1">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">To</label>
-                    <input type="date" id="repTo" class="w-full p-3 rounded-xl border border-slate-200 mt-1">
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="setRepDate('week')" class="flex-1 py-2 bg-white border rounded-lg text-xs font-bold text-slate-500">This Week</button>
-                <button onclick="setRepDate('month')" class="flex-1 py-2 bg-white border rounded-lg text-xs font-bold text-slate-500">This Month</button>
-            </div>
-            <button onclick="generateReport()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Generate Report</button>
-            
-            <!-- Report Output Area -->
-            <div id="reportOutput" class="bg-white rounded-xl shadow-sm p-4 mt-6 hidden">
-                <h2 class="text-center font-bold text-lg border-b pb-2 mb-2" id="repTitle">Report</h2>
-                <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-slate-400 uppercase border-b">
-                        <tr><th class="pb-2">Date/Desc</th><th class="pb-2 text-right">Amount</th></tr>
-                    </thead>
-                    <tbody id="repBody" class="divide-y"></tbody>
-                    <tfoot>
-                        <tr><td class="pt-2 font-bold">Total</td><td class="pt-2 text-right font-bold" id="repTotal">0</td></tr>
-                    </tfoot>
-                </table>
-            </div>
+            <button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button>
         </div>
     </div>
 
-    <!-- Edit Friends Modal (Now includes Add New) -->
+    <!-- Reused Modals (Edit Friends, History, etc.) -->
     <div id="modal-edit-friends" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
         <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
             <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
@@ -201,10 +242,11 @@
         <div class="p-4 bg-white border-b">
             <button onclick="openModal('addPerson')" class="w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">+ Add New Friend</button>
         </div>
-        <div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="editFriendsList"></div>
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="editFriendsList">
+            <div class="text-center text-slate-400 p-8">Tap + to add your friends.<br>You can rename or delete them here.</div>
+        </div>
     </div>
 
-    <!-- View All Friends Modal (New) -->
     <div id="modal-all-friends" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
         <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
             <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
@@ -214,7 +256,6 @@
         <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="allFriendsList"></div>
     </div>
 
-    <!-- Other Modals (History, Week, Add Person, Ledger, Settings, Reset) -->
     <div id="modal-history" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
         <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
             <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
@@ -233,12 +274,13 @@
         <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div>
     </div>
 
+    <!-- ADD PERSON MODAL -->
     <div id="modal-addPerson" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="font-bold text-xl mb-1 text-slate-800">New Friend</h3>
             <input type="text" id="newPersonName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-lg outline-none focus:border-blue-500 transition mb-6" placeholder="Name">
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold rounded-xl hover:bg-slate-50">Cancel</button>
+                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold rounded-xl hover:bg-slate-50">Done</button>
                 <button onclick="addPerson()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">Add</button>
             </div>
         </div>
@@ -252,27 +294,11 @@
         </div>
         <div class="flex-1 overflow-y-auto bg-slate-50">
             <table class="w-full text-left text-sm border-collapse">
-                <thead class="bg-slate-100 text-slate-500 text-xs uppercase sticky top-0">
-                    <tr><th class="p-4">Txn</th><th class="p-4 text-right text-red-500">Debit</th><th class="p-4 text-right text-green-600">Credit</th></tr>
-                </thead>
+                <thead class="bg-slate-100 text-slate-500 text-xs uppercase sticky top-0"><tr><th class="p-4">Txn</th><th class="p-4 text-right text-red-500">Debit</th><th class="p-4 text-right text-green-600">Credit</th></tr></thead>
                 <tbody id="ledgerTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
             </table>
         </div>
         <div class="p-6 border-t bg-white safe-pb"><div class="flex justify-between items-center"><span class="text-slate-500 font-bold">Net Balance</span><span id="ledgerTotal" class="text-2xl font-extrabold">0</span></div></div>
-    </div>
-
-    <div id="modal-settings" class="modal-overlay fixed inset-0 bg-black/60 z-[70] flex items-center justify-center px-6 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-            <h3 class="font-bold text-xl mb-6 text-slate-800">Settings</h3>
-            <div class="space-y-3">
-                <button onclick="openEditFriends()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-user-pen text-purple-500"></i> Edit Friends</button>
-                <button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-blue-500"></i> Backup Data</button>
-                <label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-blue-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label>
-                <button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button>
-                <button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button>
-            </div>
-            <button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button>
-        </div>
     </div>
 
     <div id="modal-reset-opts" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm">
@@ -289,35 +315,56 @@
 
     <!-- LOGIC -->
     <script>
-        const APP_VERSION = '7.1'; 
-        const STORAGE_KEY = 'splitifyData_v7_1';
-        let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [] };
+        const APP_VERSION = '7.2'; 
+        const STORAGE_KEY = 'splitifyData_v7_1'; // Keeping data compatible
+        let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [], userName: 'User' };
         let currentFormType = '';
         let editTransIndex = -1;
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
 
-        // --- DATA MIGRATION & INIT ---
+        // --- INIT & ONBOARDING ---
         window.onload = () => {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 appData = JSON.parse(saved);
+                if(!appData.userName) appData.userName = 'User';
             } else {
-                // Migration Logic: Check for V7 data
-                const oldData = localStorage.getItem('splitifyData_v7'); // Previous Key
-                if (oldData) {
-                    console.log("Migrating data from v7 to v7.1");
-                    appData = JSON.parse(oldData);
-                    saveData(); // Save to new key
-                }
-                // Else start fresh
+                openOnboarding();
             }
             recalculate();
+            updateWelcome();
             
             window.onpopstate = () => {
                 document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
             };
         };
+
+        function openOnboarding(force = false) {
+            if(force || !localStorage.getItem('splitify_onboarded')) {
+                document.getElementById('modal-onboarding').classList.add('active');
+            }
+        }
+
+        function finishOnboarding() {
+            const name = document.getElementById('setupName').value;
+            if(name) {
+                appData.userName = name;
+                saveData();
+                localStorage.setItem('splitify_onboarded', 'true');
+                document.getElementById('modal-onboarding').classList.remove('active');
+                updateWelcome();
+            }
+        }
+
+        function updateWelcome() {
+            document.getElementById('welcomeUser').innerText = "Hello, " + appData.userName;
+        }
+
+        function changeName() {
+            const newName = prompt("Enter your name:", appData.userName);
+            if(newName) { appData.userName = newName; saveData(); updateWelcome(); closeModal(); }
+        }
 
         function openModal(id) {
             document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
@@ -335,7 +382,7 @@
             recalculate();
         }
 
-        // --- CORE MATH (Same as v7) ---
+        // --- CORE MATH ---
         function recalculate() {
             let c = 0, b = 0, w = 0;
             let pBal = {};
@@ -353,6 +400,8 @@
                     case 'EXPENSE': 
                         if(isBank) b -= amt; else c -= amt;
                         if(isCurrentWeek) w += amt; 
+                        // Logic for Paid For Friend (Expenses that are also Debts)
+                        if(p && p!=='Self') pBal[p] += amt;
                         break;
                     case 'TRANSFER_IN': 
                         if(isBank) b += amt; else c += amt;
@@ -378,7 +427,7 @@
             renderUI();
         }
 
-        // --- RENDERING UI ---
+        // --- RENDERING ---
         function renderUI() {
             document.getElementById('dispCash').innerText = appData.cash.toLocaleString();
             document.getElementById('dispBank').innerText = appData.bank.toLocaleString();
@@ -399,105 +448,147 @@
 
             if(sortedPeople.length === 0) list.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium">No active balances.</div>`;
             
-            // Dashboard list only shows active balances (Hidden 0s)
             sortedPeople.forEach(([name, bal]) => {
                 const color = bal >= 0 ? 'text-green-600' : 'text-red-500';
                 const label = bal >= 0 ? 'OWES YOU' : 'YOU OWE';
                 const bg = bal >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500';
-                
                 list.innerHTML += `
                     <div onclick="openLedger('${name}')" class="flex justify-between items-center p-4 hover:bg-slate-50 transition cursor-pointer active:bg-slate-100">
-                        <div class="flex items-center gap-4 pointer-events-none">
-                            <div class="w-12 h-12 rounded-full ${bg} flex items-center justify-center font-bold text-lg shadow-sm">${name[0]}</div>
-                            <div>
-                                <p class="font-bold text-slate-800 text-lg leading-tight">${name}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">${label}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 pointer-events-none">
-                            <p class="font-extrabold ${color} text-lg">${Math.abs(bal).toLocaleString()}</p>
-                            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-                        </div>
+                        <div class="flex items-center gap-4 pointer-events-none"><div class="w-12 h-12 rounded-full ${bg} flex items-center justify-center font-bold text-lg shadow-sm">${name[0]}</div><div><p class="font-bold text-slate-800 text-lg leading-tight">${name}</p><p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">${label}</p></div></div>
+                        <div class="flex items-center gap-3 pointer-events-none"><p class="font-extrabold ${color} text-lg">${Math.abs(bal).toLocaleString()}</p><i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i></div>
                     </div>`;
             });
-
             renderTransList([...appData.trans].reverse().slice(0, 3), 'transList');
         }
 
         function renderTransList(arr, elId) {
-            const el = document.getElementById(elId);
-            el.innerHTML = '';
+            const el = document.getElementById(elId); el.innerHTML = '';
             arr.forEach((t) => {
                 const realIndex = appData.trans.indexOf(t);
                 let icon = 'fa-receipt'; let color = 'bg-slate-100 text-slate-500';
-                
                 if(t.type.includes('EXPENSE') || t.type.includes('SHARE')) { icon = 'fa-arrow-trend-down'; color = 'bg-red-100 text-red-500'; }
-                else if(['RECEIVED', 'ACC_RECV', 'TRANSFER_IN'].includes(t.type) || (t.type==='BALANCE_CORRECTION' && t.mode==='IN')) { icon = 'fa-arrow-down'; color = 'bg-green-100 text-green-500'; }
-                else if(['DEBIT', 'ACC_SENT', 'TRANSFER_OUT'].includes(t.type) || (t.type==='BALANCE_CORRECTION' && t.mode==='OUT')) { icon = 'fa-arrow-up'; color = 'bg-orange-100 text-orange-500'; }
-
-                let amtDisplay = parseInt(t.amt).toLocaleString();
+                else if(['RECEIVED', 'ACC_RECV', 'TRANSFER_IN'].includes(t.type)) { icon = 'fa-arrow-down'; color = 'bg-green-100 text-green-500'; }
+                else if(['DEBIT', 'ACC_SENT', 'TRANSFER_OUT'].includes(t.type)) { icon = 'fa-arrow-up'; color = 'bg-orange-100 text-orange-500'; }
                 let sourceBadge = t.source === 'BANK' ? '<span class="text-[9px] bg-blue-100 text-blue-600 px-1 rounded ml-2">BANK</span>' : '';
-
-                el.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <div class="w-10 h-10 rounded-full ${color} flex items-center justify-center shrink-0"><i class="fa-solid ${icon}"></i></div>
-                            <div class="min-w-0">
-                                <p class="font-bold text-slate-700 truncate text-sm flex items-center">${t.desc} ${sourceBadge}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">${t.date} • ${t.person || 'Self'}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 pl-2">
-                            <span class="font-bold text-slate-800">${amtDisplay}</span>
-                            <button onclick="editTransaction(${realIndex})" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-blue-600"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="if(confirm('Delete?')){appData.trans.splice(${realIndex},1);saveData();renderUI();${elId==='fullHistoryList'?'showAllHistory()':''}}" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // --- NEW: View All Friends Logic ---
-        function openAllFriendsModal() {
-            openModal('all-friends');
-            const list = document.getElementById('allFriendsList');
-            list.innerHTML = '';
-            
-            // Show ALL friends including 0 balance
-            const entries = Object.entries(appData.people).sort((a,b) => b[1] - a[1]);
-            
-            entries.forEach(([name, bal]) => {
-                const color = bal >= 0 ? 'text-green-600' : 'text-red-500';
-                const bg = bal >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500';
                 
-                list.innerHTML += `
-                    <div onclick="openLedger('${name}')" class="flex justify-between items-center p-4 bg-white border rounded-xl shadow-sm hover:bg-slate-50 active:bg-slate-100 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full ${bg} flex items-center justify-center font-bold">${name[0]}</div>
-                            <span class="font-bold text-slate-800">${name}</span>
-                        </div>
-                        <span class="font-bold ${color}">${Math.abs(bal).toLocaleString()}</span>
-                    </div>`;
+                // Show 'Paid for X' if Expense has person
+                let descText = t.desc;
+                if(t.type === 'EXPENSE' && t.person !== 'Self') descText += ` (For ${t.person})`;
+
+                el.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm"><div class="flex items-center gap-3 overflow-hidden"><div class="w-10 h-10 rounded-full ${color} flex items-center justify-center shrink-0"><i class="fa-solid ${icon}"></i></div><div class="min-w-0"><p class="font-bold text-slate-700 truncate text-sm flex items-center">${descText} ${sourceBadge}</p><p class="text-[10px] text-slate-400 font-bold uppercase">${t.date} • ${t.person || 'Self'}</p></div></div><div class="flex items-center gap-2 pl-2"><span class="font-bold text-slate-800">${parseInt(t.amt).toLocaleString()}</span><button onclick="editTransaction(${realIndex})" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-blue-600"><i class="fa-solid fa-pen text-xs"></i></button><button onclick="if(confirm('Delete?')){appData.trans.splice(${realIndex},1);saveData();renderUI();${elId==='fullHistoryList'?'showAllHistory()':''}}" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button></div></div>`;
             });
         }
 
-        function openEditFriends() {
-            openModal('edit-friends');
-            const list = document.getElementById('editFriendsList');
-            list.innerHTML = '';
-            Object.keys(appData.people).forEach(p => {
-                list.innerHTML += `
-                    <div class="flex justify-between items-center p-3 bg-white border rounded-xl mb-2">
-                        <span class="font-bold">${p}</span>
-                        <div class="flex gap-2">
-                            <button onclick="renameFriend('${p}')" class="text-blue-500 p-2"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteFriend('${p}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
+        // --- ACCOUNT LEDGERS ---
+        function openAccountLedger(type) {
+            openModal('account-ledger');
+            const title = type === 'CASH' ? "Cash Ledger" : "Bank Ledger";
+            const bgClass = type === 'CASH' ? "bg-slate-800" : "bg-blue-600";
+            const currentBal = type === 'CASH' ? appData.cash : appData.bank;
+            
+            document.getElementById('accLedgerTitle').innerText = title;
+            document.getElementById('accLedgerHeader').className = `p-6 text-white ${bgClass}`;
+            document.getElementById('accLedgerBalance').innerText = currentBal.toLocaleString();
+            
+            const tbody = document.getElementById('accLedgerBody'); tbody.innerHTML = '';
+            
+            // Filter transactions affecting this account
+            const txns = appData.trans.filter(t => {
+                const isBank = t.source === 'BANK';
+                const isCash = t.source !== 'BANK'; // Default or Explicit Cash
+                
+                if(type === 'CASH' && !isCash) return false;
+                if(type === 'BANK' && !isBank) return false;
+                
+                // Exclude transfers that don't affect balance logic (like internal notes if any)
+                return true;
+            }).reverse();
+
+            txns.forEach(t => {
+                let amt = parseInt(t.amt);
+                let color = "text-slate-800";
+                let sign = "";
+                
+                // Logic for Sign
+                let isOut = false;
+                if(['EXPENSE', 'TRANSFER_OUT', 'DEBIT', 'SPLIT_MAIN', 'ACC_SENT', 'TRF_DEP'].includes(t.type)) isOut = true;
+                if(type === 'BANK' && t.type === 'TRF_WDL') isOut = true; 
+                
+                if(isOut) { amt = -amt; color = "text-red-500"; }
+                else { color = "text-green-600"; sign="+"; }
+
+                tbody.innerHTML += `<tr><td class="p-4 border-b border-slate-50"><div class="font-bold text-slate-700">${t.desc}</div><div class="text-xs text-slate-400">${t.date}</div></td><td class="p-4 border-b border-slate-50 text-right font-bold font-mono ${color}">${sign}${amt.toLocaleString()}</td></tr>`;
             });
         }
 
-        // --- FORM & EDIT ---
+        // --- FORMS & EDIT ---
         function openForm(type) { currentFormType = type; editTransIndex = -1; openModal('form'); renderFormContent(); }
+        
+        function renderFormContent() {
+            const content = document.getElementById('formContent');
+            const title = document.getElementById('formTitle');
+            const pOptions = Object.keys(appData.people).map(p => `<option value="${p}">${p}</option>`).join('');
+            
+            // Reusable Inputs
+            const amtInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Amount</label><div class="relative mt-2"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">Rs</span><input type="number" id="inpAmt" class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-2xl outline-none focus:border-blue-500 focus:bg-white transition text-slate-800" placeholder="0" autofocus></div></div>`;
+            const descInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Description</label><input type="text" id="inpDesc" class="w-full mt-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none focus:border-blue-500 focus:bg-white transition" placeholder="Details..."></div>`;
+            const sourceSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Paid Via</label><div class="flex p-1 bg-slate-100 rounded-xl mt-2"><button onclick="setSource('CASH', this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition">Cash</button><button onclick="setSource('BANK', this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400 transition">Bank</button></div><input type="hidden" id="inpSource" value="CASH"></div>`;
+            
+            // Person Select (With Self)
+            const personSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Person</label><div class="relative mt-2"><select id="inpPerson" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none appearance-none"><option value="Self">Self / Home / Deposit</option>${pOptions}</select><i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i></div></div>`;
+            
+            // Expense Person Select (NEW)
+            const expensePersonSelect = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Paid For</label><div class="relative mt-2"><select id="inpPerson" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none appearance-none"><option value="Self">Myself</option>${pOptions}</select><i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i></div></div>`;
+
+            if(currentFormType === 'bank_transfer' || currentFormType === 'cash_transfer') {
+                title.innerText = currentFormType === 'bank_transfer' ? "Bank Transfer" : "Cash Transfer";
+                content.innerHTML = `<div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4"><button onclick="setTransferMode('GIVE')" id="btnGive" class="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100">Give / Paid</button><button onclick="setTransferMode('REC')" id="btnRec" class="text-slate-400 py-2 rounded-lg font-bold">Received</button></div><input type="hidden" id="transferMode" value="GIVE">${personSelect} ${amtInput} ${descInput}`;
+            }
+            else if(currentFormType === 'expense') {
+                title.innerText = "Add Expense";
+                content.innerHTML = sourceSelect + expensePersonSelect + amtInput + descInput;
+            }
+            else if(currentFormType === 'split') {
+                title.innerText = "Split Bill";
+                let checks = `<div class="grid grid-cols-2 gap-3 mt-4">`; Object.keys(appData.people).forEach(p => checks += `<label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition cursor-pointer"><input type="checkbox" class="w-5 h-5 accent-blue-600 rounded split-check" value="${p}"><span class="font-bold text-slate-700 text-sm">${p}</span></label>`); checks += `</div>`;
+                content.innerHTML = sourceSelect + amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Split With</label>${checks}</div>`;
+            }
+        }
+
+        // ... [Helper Functions setTransferMode, setSource, submitForm are standard] ...
+        window.setTransferMode = (mode) => { document.getElementById('transferMode').value = mode; const g = document.getElementById('btnGive'), r = document.getElementById('btnRec'); if(mode === 'GIVE') { g.className="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100 shadow-sm transition"; r.className="text-slate-400 py-2 rounded-lg font-bold transition"; } else { r.className="bg-green-50 text-green-600 py-2 rounded-lg font-bold border border-green-100 shadow-sm transition"; g.className="text-slate-400 py-2 rounded-lg font-bold transition"; } };
+        window.setSource = (val, btn) => { document.getElementById('inpSource').value = val; const btns = btn.parentElement.querySelectorAll('button'); btns.forEach(b => b.className = "flex-1 py-3 font-bold rounded-lg text-slate-400 transition"); btn.className = "flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition"; };
+
+        function submitForm() {
+            const amt = parseInt(document.getElementById('inpAmt').value);
+            const desc = document.getElementById('inpDesc').value || 'Transaction';
+            if (!amt) return alert("Please enter amount");
+            const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
+            if(editTransIndex !== -1) appData.trans.splice(editTransIndex, 1);
+
+            if(currentFormType === 'expense') { 
+                const source = document.getElementById('inpSource').value; 
+                const person = document.getElementById('inpPerson').value; // New: Can be Self or Friend
+                appData.trans.push({ date, type: 'EXPENSE', amt, desc, person, source }); 
+            }
+            else if(currentFormType === 'cash_transfer' || currentFormType === 'bank_transfer') { const mode = document.getElementById('transferMode').value; const person = document.getElementById('inpPerson').value; const source = currentFormType === 'bank_transfer' ? 'BANK' : 'CASH'; const type = mode === 'GIVE' ? 'TRANSFER_OUT' : 'TRANSFER_IN'; appData.trans.push({ date, type, amt, desc, person, source }); }
+            else if(currentFormType === 'split') { const source = document.getElementById('inpSource').value; const friends = Array.from(document.querySelectorAll('.split-check:checked')).map(c => c.value); if(!friends.length) return alert("Select friends"); const share = Math.round(amt / (friends.length + 1)); appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source }); appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self' }); friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p })); }
+            saveData(); closeModal();
+        }
+
+        // --- NEW: Add Friend Flow Fix ---
+        function addPerson() { 
+            const name = document.getElementById('newPersonName').value; 
+            if(name) { 
+                appData.people[name] = 0; 
+                saveData(); 
+                document.getElementById('newPersonName').value = ""; // Clear Input
+                alert("Friend Added!"); // Feedback
+                // Keep modal open to add more
+            } 
+        }
+
+        // --- EDIT TRANSACTIONS ---
         function editTransaction(index) {
             const t = appData.trans[index]; editTransIndex = index;
             if(t.type === 'EXPENSE') currentFormType = 'expense';
@@ -514,89 +605,33 @@
             }, 100);
         }
 
-        function renderFormContent() {
-            const content = document.getElementById('formContent');
-            const title = document.getElementById('formTitle');
-            const pOptions = Object.keys(appData.people).map(p => `<option value="${p}">${p}</option>`).join('');
-            const amtInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Amount</label><div class="relative mt-2"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">Rs</span><input type="number" id="inpAmt" class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-2xl outline-none focus:border-blue-500 focus:bg-white transition text-slate-800" placeholder="0" autofocus></div></div>`;
-            const descInput = `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Description</label><input type="text" id="inpDesc" class="w-full mt-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none focus:border-blue-500 focus:bg-white transition" placeholder="Details..."></div>`;
-            const personInput = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Person</label><div class="relative mt-2"><select id="inpPerson" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-lg outline-none appearance-none"><option value="Self">Self / Home / Deposit</option>${pOptions}</select><i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i></div></div>`;
-            
-            const transferUI = `<div class="grid grid-cols-2 gap-2 p-1 bg-white border rounded-xl mb-4"><button onclick="setTransferMode('GIVE')" id="btnGive" class="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100">Give / Paid</button><button onclick="setTransferMode('REC')" id="btnRec" class="text-slate-400 py-2 rounded-lg font-bold">Received</button></div><input type="hidden" id="transferMode" value="GIVE">${personInput} ${amtInput} ${descInput}`;
-
-            if(currentFormType === 'bank_transfer') { title.innerText = "Bank Transfer"; content.innerHTML = transferUI; }
-            else if(currentFormType === 'cash_transfer') { title.innerText = "Cash Transfer"; content.innerHTML = transferUI; }
-            else if(currentFormType === 'expense') { title.innerText = "Add Expense"; content.innerHTML = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Paid Via</label><div class="flex p-1 bg-slate-100 rounded-xl mt-2"><button onclick="setSource('CASH', this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition">Cash</button><button onclick="setSource('BANK', this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400 transition">Bank</button></div><input type="hidden" id="inpSource" value="CASH"></div>` + amtInput + descInput; }
-            else if(currentFormType === 'split') { title.innerText = "Split Bill"; let checks = `<div class="grid grid-cols-2 gap-3 mt-4">`; Object.keys(appData.people).forEach(p => checks += `<label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition cursor-pointer"><input type="checkbox" class="w-5 h-5 accent-blue-600 rounded split-check" value="${p}"><span class="font-bold text-slate-700 text-sm">${p}</span></label>`); checks += `</div>`; content.innerHTML = `<div class="mb-4"><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Paid Via</label><div class="flex p-1 bg-slate-100 rounded-xl mt-2"><button onclick="setSource('CASH', this)" class="flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition">Cash</button><button onclick="setSource('BANK', this)" class="flex-1 py-3 font-bold rounded-lg text-slate-400 transition">Bank</button></div><input type="hidden" id="inpSource" value="CASH"></div>` + amtInput + descInput + `<div><label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Split With</label>${checks}</div>`; }
-        }
-
-        window.setTransferMode = (mode) => { document.getElementById('transferMode').value = mode; const g = document.getElementById('btnGive'), r = document.getElementById('btnRec'); if(mode === 'GIVE') { g.className="bg-red-50 text-red-600 py-2 rounded-lg font-bold border border-red-100 shadow-sm transition"; r.className="text-slate-400 py-2 rounded-lg font-bold transition"; } else { r.className="bg-green-50 text-green-600 py-2 rounded-lg font-bold border border-green-100 shadow-sm transition"; g.className="text-slate-400 py-2 rounded-lg font-bold transition"; } };
-        window.setSource = (val, btn) => { document.getElementById('inpSource').value = val; const btns = btn.parentElement.querySelectorAll('button'); btns.forEach(b => b.className = "flex-1 py-3 font-bold rounded-lg text-slate-400 transition"); btn.className = "flex-1 py-3 font-bold rounded-lg bg-white shadow text-blue-600 transition"; };
-
-        function submitForm() {
-            const amt = parseInt(document.getElementById('inpAmt').value);
-            const desc = document.getElementById('inpDesc').value || 'Transaction';
-            if (!amt) return alert("Please enter amount");
-            const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
-            if(editTransIndex !== -1) appData.trans.splice(editTransIndex, 1);
-
-            if(currentFormType === 'expense') { const source = document.getElementById('inpSource').value; appData.trans.push({ date, type: 'EXPENSE', amt, desc, person: 'Self', source }); }
-            else if(currentFormType === 'cash_transfer' || currentFormType === 'bank_transfer') { const mode = document.getElementById('transferMode').value; const person = document.getElementById('inpPerson').value; const source = currentFormType === 'bank_transfer' ? 'BANK' : 'CASH'; const type = mode === 'GIVE' ? 'TRANSFER_OUT' : 'TRANSFER_IN'; appData.trans.push({ date, type, amt, desc, person, source }); }
-            else if(currentFormType === 'split') { const source = document.getElementById('inpSource').value; const friends = Array.from(document.querySelectorAll('.split-check:checked')).map(c => c.value); if(!friends.length) return alert("Select friends"); const share = Math.round(amt / (friends.length + 1)); appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source }); appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self' }); friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p })); }
-            saveData(); closeModal();
-        }
-
-        // --- UTILS ---
-        function renameFriend(oldName) { const newName = prompt("Enter new name:", oldName); if(newName && newName !== oldName) { appData.people[newName] = appData.people[oldName]; delete appData.people[oldName]; appData.trans.forEach(t => { if(t.person === oldName) t.person = newName; }); saveData(); openEditFriends(); } }
-        function deleteFriend(name) { if(confirm(`Delete ${name} and ALL their transactions? This cannot be undone.`)) { delete appData.people[name]; appData.trans = appData.trans.filter(t => t.person !== name); saveData(); openEditFriends(); } }
-        function showAllHistory() { openModal('history'); renderTransList([...appData.trans].reverse(), 'fullHistoryList'); }
-        function showWeekDetails() { openModal('week'); renderTransList([...appData.trans].reverse().filter(t => !t.weekReset && (t.type==='EXPENSE' || t.type==='SPLIT_SHARE')), 'weekDetailList'); }
-        function openLedger(name) { 
-            openModal('ledger'); 
-            document.getElementById('ledgerName').innerText = name; 
-            const tbody = document.getElementById('ledgerTableBody'); tbody.innerHTML = '';
-            const personTrans = appData.trans.filter(t => t.person === name).reverse();
-            personTrans.forEach(t => {
-                let d = '', c = '';
-                if(['DEBIT', 'ACC_SENT', 'TRANSFER_OUT', 'SPLIT_DEBIT'].includes(t.type) || (t.type==='BALANCE_CORRECTION' && t.mode==='OUT')) d = parseInt(t.amt).toLocaleString();
-                if(['RECEIVED', 'ACC_RECV', 'TRANSFER_IN'].includes(t.type) || (t.type==='BALANCE_CORRECTION' && t.mode==='IN')) c = parseInt(t.amt).toLocaleString();
-                if(d || c) tbody.innerHTML += `<tr><td class="p-4 border-b border-slate-50"><div class="font-bold text-slate-700">${t.desc}</div><div class="text-xs text-slate-400">${t.date}</div></td><td class="p-4 border-b border-slate-50 text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b border-slate-50 text-right text-green-600 font-bold">${c}</td></tr>`;
-            });
-            const currentBal = appData.people[name] || 0;
-            const color = currentBal >= 0 ? "text-green-600" : "text-red-500";
-            document.getElementById('ledgerTotal').className = `text-2xl font-extrabold ${color}`;
-            document.getElementById('ledgerTotal').innerText = Math.abs(currentBal).toLocaleString();
-        }
-        function addPerson() { const name = document.getElementById('newPersonName').value; if(name) { appData.people[name] = 0; saveData(); closeModal(); openEditFriends(); } }
-        function openSettings() { openModal('settings'); }
-        function openReportModal() { openModal('report'); const sel = document.getElementById('repPerson'); sel.innerHTML = Object.keys(appData.people).map(p => `<option value="${p}">${p}</option>`).join(''); toggleRepPerson(); }
-        function toggleRepPerson() { document.getElementById('repPersonDiv').style.display = document.getElementById('repType').value === 'INDIVIDUAL' ? 'block' : 'none'; }
+        // --- REPORTS (Expenses Only) ---
+        function openReportModal() { openModal('report'); setRepDate('month'); }
         function setRepDate(range) { const now = new Date(); const to = now.toISOString().split('T')[0]; let from = new Date(); if(range === 'week') { const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); from.setDate(diff); } else { from.setDate(1); } document.getElementById('repFrom').value = from.toISOString().split('T')[0]; document.getElementById('repTo').value = to; }
         function generateReport() {
-            const type = document.getElementById('repType').value; const pName = document.getElementById('repPerson').value; const from = new Date(document.getElementById('repFrom').value); const to = new Date(document.getElementById('repTo').value); to.setHours(23,59,59);
-            let total = 0; const tbody = document.getElementById('repBody'); tbody.innerHTML = ''; document.getElementById('reportOutput').classList.remove('hidden'); document.getElementById('repTitle').innerText = type.replace('_', ' ') + (type==='INDIVIDUAL' ? `: ${pName}` : '');
+            const from = new Date(document.getElementById('repFrom').value); const to = new Date(document.getElementById('repTo').value); to.setHours(23,59,59);
+            let total = 0; const tbody = document.getElementById('repBody'); tbody.innerHTML = ''; document.getElementById('reportOutput').classList.remove('hidden');
             const filtered = appData.trans.filter(t => {
                 const dParts = t.date.split(' '); const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}; const tDate = new Date(new Date().getFullYear(), months[dParts[1]], parseInt(dParts[0]));
                 if(tDate < from || tDate > to) return false;
-                if(type === 'EXPENSE') return t.type === 'EXPENSE' || t.type === 'SPLIT_SHARE';
-                if(type === 'CASH_LEDGER') return t.source === 'CASH' || (!t.source && t.type !== 'ACC_SENT' && t.type !== 'ACC_RECV');
-                if(type === 'BANK_LEDGER') return t.source === 'BANK' || t.type === 'ACC_SENT' || t.type === 'ACC_RECV';
-                if(type === 'INDIVIDUAL') return t.person === pName;
-                return false;
+                return t.type === 'EXPENSE' || t.type === 'SPLIT_SHARE';
             });
-            filtered.forEach(t => { let amt = parseInt(t.amt); if(type === 'CASH_LEDGER' || type === 'BANK_LEDGER') { if(['EXPENSE', 'TRANSFER_OUT', 'DEBIT', 'ACC_SENT', 'SPLIT_MAIN'].includes(t.type)) amt = -amt; } total += amt; tbody.innerHTML += `<tr><td class="py-2 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date}</div></td><td class="py-2 border-b text-right font-mono">${amt}</td></tr>`; });
-            document.getElementById('repTotal').innerText = total;
+            filtered.forEach(t => { total += parseInt(t.amt); tbody.innerHTML += `<tr><td class="py-2 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date}</div></td><td class="py-2 border-b text-right font-mono">${parseInt(t.amt)}</td></tr>`; });
+            document.getElementById('repTotal').innerText = total.toLocaleString();
         }
+
+        // --- UTILS ---
+        function openAllFriendsModal() { openModal('all-friends'); const list = document.getElementById('allFriendsList'); list.innerHTML = ''; Object.entries(appData.people).sort((a,b)=>b[1]-a[1]).forEach(([name, bal]) => { const color = bal >= 0 ? 'text-green-600' : 'text-red-500'; const bg = bal >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'; list.innerHTML += `<div onclick="openLedger('${name}')" class="flex justify-between items-center p-4 bg-white border rounded-xl shadow-sm hover:bg-slate-50 active:bg-slate-100 transition"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full ${bg} flex items-center justify-center font-bold">${name[0]}</div><span class="font-bold text-slate-800">${name}</span></div><span class="font-bold ${color}">${Math.abs(bal).toLocaleString()}</span></div>`; }); }
+        function openEditFriends() { openModal('edit-friends'); const list = document.getElementById('editFriendsList'); list.innerHTML = ''; Object.keys(appData.people).forEach(p => { list.innerHTML += `<div class="flex justify-between items-center p-3 bg-white border rounded-xl mb-2"><span class="font-bold">${p}</span><div class="flex gap-2"><button onclick="renameFriend('${p}')" class="text-blue-500 p-2"><i class="fa-solid fa-pen"></i></button><button onclick="deleteFriend('${p}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button></div></div>`; }); }
+        function renameFriend(oldName) { const newName = prompt("Enter new name:", oldName); if(newName && newName !== oldName) { appData.people[newName] = appData.people[oldName]; delete appData.people[oldName]; appData.trans.forEach(t => { if(t.person === oldName) t.person = newName; }); saveData(); openEditFriends(); } }
+        function deleteFriend(name) { if(confirm(`Delete ${name}?`)) { delete appData.people[name]; appData.trans = appData.trans.filter(t => t.person !== name); saveData(); openEditFriends(); } }
+        function showAllHistory() { openModal('history'); renderTransList([...appData.trans].reverse(), 'fullHistoryList'); }
+        function showWeekDetails() { openModal('week'); renderTransList([...appData.trans].reverse().filter(t => !t.weekReset && (t.type==='EXPENSE' || t.type==='SPLIT_SHARE')), 'weekDetailList'); }
+        function openLedger(name) { openModal('ledger'); document.getElementById('ledgerName').innerText = name; const tbody = document.getElementById('ledgerTableBody'); tbody.innerHTML = ''; appData.trans.filter(t => t.person === name).reverse().forEach(t => { let d='', c=''; if(['DEBIT', 'ACC_SENT', 'TRANSFER_OUT', 'SPLIT_DEBIT'].includes(t.type)) d=parseInt(t.amt).toLocaleString(); if(['RECEIVED', 'ACC_RECV', 'TRANSFER_IN'].includes(t.type)) c=parseInt(t.amt).toLocaleString(); if(t.type==='EXPENSE') d=parseInt(t.amt).toLocaleString(); /*Expense for friend*/ if(d||c) tbody.innerHTML += `<tr><td class="p-4 border-b border-slate-50"><div class="font-bold text-slate-700">${t.desc}</div><div class="text-xs text-slate-400">${t.date}</div></td><td class="p-4 border-b border-slate-50 text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b border-slate-50 text-right text-green-600 font-bold">${c}</td></tr>`; }); document.getElementById('ledgerTotal').innerText = Math.abs(appData.people[name]).toLocaleString(); document.getElementById('ledgerTotal').className = appData.people[name] >= 0 ? "text-2xl font-extrabold text-green-600" : "text-2xl font-extrabold text-red-500"; }
+        function openSettings() { openModal('settings'); }
         function showResetOptions() { openModal('reset-opts'); }
         function resetWeekExpensesOnly() { if(confirm('Reset Week Expense Counter to 0?')) { appData.trans.forEach(t => { if(['EXPENSE','SPLIT_SHARE'].includes(t.type)) t.weekReset = true; }); saveData(); closeModal(); } }
-        function resetBalance(target) { 
-            const currentBal = target === 'CASH' ? appData.cash : appData.bank;
-            if(currentBal === 0) return alert("Balance is already 0.");
-            const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
-            const mode = currentBal > 0 ? 'OUT' : 'IN';
-            appData.trans.push({ date, type: 'BALANCE_CORRECTION', mode: mode, amt: Math.abs(currentBal), desc: 'Manual Reset', person: 'Self', source: target });
-            saveData(); closeModal(); alert(`${target} reset to 0.`);
-        }
+        function resetBalance(target) { const currentBal = target === 'CASH' ? appData.cash : appData.bank; if(currentBal === 0) return alert("Balance is already 0."); const date = new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short'}); const mode = currentBal > 0 ? 'OUT' : 'IN'; appData.trans.push({ date, type: 'BALANCE_CORRECTION', mode: mode, amt: Math.abs(currentBal), desc: 'Manual Reset', person: 'Self', source: target }); saveData(); closeModal(); alert(`${target} reset to 0.`); }
         function resetApp() { if(confirm("Start Fresh? ALL DATA WILL BE LOST.")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
         function downloadData() { const a = document.createElement("a"); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData)); a.download = "splitify_backup.json"; a.click(); }
         function importData(input) { const r = new FileReader(); r.onload = (e) => { try { appData = JSON.parse(e.target.result); saveData(); alert("Data Restored!"); closeModal(); } catch(err) { alert("Invalid File"); } }; r.readAsText(input.files[0]); }
