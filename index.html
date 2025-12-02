@@ -57,7 +57,6 @@
             </div>
 
             <div class="flex justify-between px-2 text-xs font-medium text-blue-100">
-                <!-- Fixed Click Handler -->
                 <div onclick="showWeekDetails()" class="cursor-pointer active:opacity-70 transition p-1 -ml-1 rounded hover:bg-blue-500/20">
                     <span class="w-2 h-2 inline-block bg-white rounded-full mr-1"></span>Week Exp: <span id="dispWeek" class="text-white font-bold">0</span>
                 </div>
@@ -90,7 +89,7 @@
         <!-- Attribution -->
         <div class="text-center pb-4 pt-4">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Created By</p>
-            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v8.1</span></p>
+            <p class="text-xs font-bold text-blue-600 mt-1">Saqib Zahid <span class="text-slate-300 mx-1">&</span> Muzammil Mahmood <span class="text-slate-400 ml-1 font-normal opacity-50">v8.2</span></p>
         </div>
     </div>
 
@@ -110,8 +109,8 @@
         </button>
     </div>
 
-    <!-- ================= MODALS ================= -->
-
+    <!-- MODALS -->
+    
     <!-- ONBOARDING -->
     <div id="modal-onboarding" class="modal-overlay fixed inset-0 bg-blue-600 z-[90] flex flex-col items-center justify-center p-8 text-white text-center">
         <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6 backdrop-blur-xl shadow-xl"><i class="fa-solid fa-wallet text-4xl"></i></div>
@@ -136,6 +135,16 @@
         </div>
     </div>
 
+    <!-- TAGS MANAGEMENT MODAL -->
+    <div id="modal-tags" class="modal-overlay fixed inset-0 bg-white z-[70] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 class="font-bold text-lg">Manage Tags</h3>
+            <button onclick="addNewTag()" class="text-blue-600 font-bold text-sm">+ New</button>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="tagsListContainer"></div>
+    </div>
+
     <!-- REPORT MODAL -->
     <div id="modal-report" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]">
         <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
@@ -155,7 +164,6 @@
             <button onclick="generateReport()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg">Generate Analysis</button>
             
             <div id="reportOutput" class="hidden space-y-4 mt-4">
-                <!-- Fallback Message -->
                 <div id="chartError" class="hidden p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm">Graph unavailable offline</div>
                 <div class="bg-white p-4 rounded-xl shadow-sm">
                     <h4 class="font-bold text-slate-700 mb-4 text-center">Expense by Category</h4>
@@ -171,35 +179,25 @@
         </div>
     </div>
 
-    <!-- WEEK DETAILS MODAL (Missing in previous version causing non-response) -->
-    <div id="modal-week" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col">
-        <div class="p-4 border-b flex justify-between items-center bg-white safe-top">
-            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 class="font-bold text-lg">Week Details</h3>
-            <div class="w-10"></div>
-        </div>
-        <div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div>
-    </div>
-
     <!-- SETTINGS & OTHER MODALS -->
     <div id="modal-settings" class="modal-overlay fixed inset-0 bg-black/60 z-[70] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-xl mb-6 text-slate-800">Settings</h3><div class="space-y-3"><button onclick="changeName()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-id-card text-blue-500"></i> Change Name</button><button onclick="openTagsManager()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-tags text-pink-500"></i> Manage Tags</button><button onclick="openEditFriends()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-user-group text-purple-500"></i> Edit Friends</button><button onclick="downloadData()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-download text-slate-500"></i> Backup Data</button><label class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition cursor-pointer"><i class="fa-solid fa-upload text-slate-500"></i> Restore Data<input type="file" class="hidden" onchange="importData(this)" accept=".json"></label><button onclick="showResetOptions()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 flex items-center gap-3 hover:bg-slate-100 transition"><i class="fa-solid fa-calendar-week text-orange-500"></i> Start New Week</button><button onclick="resetApp()" class="w-full p-4 bg-red-50 rounded-xl font-bold text-red-600 flex items-center gap-3 hover:bg-red-100 transition mt-4"><i class="fa-solid fa-trash"></i> Reset All Data</button></div><button onclick="closeModal()" class="w-full py-4 mt-4 text-slate-400 font-bold">Close</button></div></div>
     <div id="modal-menu" class="modal-overlay fixed inset-0 bg-black/60 flex flex-col justify-end backdrop-blur-sm" onclick="if(event.target===this) closeModal()"><div class="modal-content bg-white w-full rounded-t-[2rem] p-6 pb-safe shadow-2xl"><div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div><div class="grid grid-cols-2 gap-4 mb-4"><button onclick="openForm('cash_transfer')" class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-money-bill-transfer text-2xl text-emerald-600"></i><span class="font-bold text-emerald-800">Cash Transfer</span></button><button onclick="openForm('bank_transfer')" class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col items-center gap-3 active:scale-95 transition"><i class="fa-solid fa-building-columns text-2xl text-blue-600"></i><span class="font-bold text-blue-800">Bank Transfer</span></button></div><button onclick="openReportModal()" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center gap-3 font-bold text-slate-700 active:scale-95 transition"><i class="fa-solid fa-chart-pie text-purple-500"></i> Analytics & Reports</button></div></div>
     
     <!-- TAGS & LEDGERS -->
-    <div id="modal-tags" class="modal-overlay fixed inset-0 bg-white z-[70] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Manage Tags</h3><button onclick="addNewTagRoot()" class="text-blue-600 font-bold text-sm">+ New</button></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="tagsListContainer"></div></div>
     <div id="modal-edit-friends" class="modal-overlay fixed inset-0 bg-white flex flex-col z-[60]"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Manage Friends</h3><div class="w-10"></div></div><div class="p-4 bg-white border-b"><button onclick="openModal('addPerson')" class="w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">+ Add New Friend</button></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4" id="editFriendsList"></div></div>
     <div id="modal-account-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 id="accLedgerTitle" class="font-bold text-lg">Account Ledger</h3><div class="w-10"></div></div><div id="accLedgerHeader" class="p-6 bg-blue-600 text-white"><p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Current Balance</p><p class="text-3xl font-extrabold mt-1" id="accLedgerBalance">0</p></div><div class="flex-1 overflow-y-auto bg-slate-50"><table class="w-full text-left text-sm border-collapse"><tbody id="accLedgerBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div></div>
     <div id="modal-all-friends" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">All Friends</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="allFriendsList"></div></div>
     <div id="modal-history" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">All Transactions</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="fullHistoryList"></div></div>
+    <div id="modal-week" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 class="font-bold text-lg">Week Details</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50 p-4 space-y-2" id="weekDetailList"></div></div>
     <div id="modal-addPerson" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-xl mb-1 text-slate-800">New Friend</h3><input type="text" id="newPersonName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-lg outline-none focus:border-blue-500 transition mb-6" placeholder="Name"><div class="flex gap-3"><button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold rounded-xl hover:bg-slate-50">Done</button><button onclick="addPerson()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">Add</button></div></div></div>
     <div id="modal-ledger" class="modal-overlay fixed inset-0 bg-white z-[60] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-white safe-top"><button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-left"></i></button><h3 id="ledgerName" class="font-bold text-lg">Details</h3><div class="w-10"></div></div><div class="flex-1 overflow-y-auto bg-slate-50"><table class="w-full text-left text-sm border-collapse"><tbody id="ledgerTableBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div><div class="p-6 border-t bg-white safe-pb"><div class="flex justify-between items-center"><span class="text-slate-500 font-bold">Net Balance</span><span id="ledgerTotal" class="text-2xl font-extrabold">0</span></div></div></div>
     <div id="modal-reset-opts" class="modal-overlay fixed inset-0 bg-black/60 z-[80] flex items-center justify-center px-6 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-slate-800">What to reset?</h3><div class="space-y-2"><button onclick="resetWeekExpensesOnly()" class="w-full p-3 bg-blue-50 text-blue-700 rounded-xl font-bold">Reset Expenses Only</button><button onclick="resetBalance('CASH')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Cash to 0</button><button onclick="resetBalance('BANK')" class="w-full p-3 bg-slate-50 text-slate-700 rounded-xl font-bold">Reset Bank to 0</button></div><button onclick="closeModal()" class="w-full py-3 mt-2 text-slate-400 font-bold">Cancel</button></div></div>
 
     <!-- LOGIC -->
     <script>
-        const APP_VERSION = '8.1'; 
+        const APP_VERSION = '8.2'; 
         const STORAGE_KEY = 'splitifyData_v8';
-        let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [], tags: { 'Food': [], 'Transport': [], 'Bills': [] }, userName: 'User' };
+        let appData = { cash: 0, bank: 0, week: 0, people: {}, trans: [], tags: ['Food', 'Transport', 'Bills'], userName: 'User' };
         let currentFormType = '', editTransIndex = -1;
         let chartInstance = null;
         let selectedTag = '';
@@ -208,8 +206,25 @@
 
         window.onload = () => {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { appData = JSON.parse(saved); if(!appData.tags) appData.tags = { 'Food': [], 'Transport': [] }; } 
-            else { const old = localStorage.getItem('splitifyData_v7_1'); if(old) { appData = JSON.parse(old); appData.tags = { 'Food': [], 'Transport': [] }; saveData(); } else openOnboarding(); }
+            if (saved) { 
+                appData = JSON.parse(saved); 
+                // Migration to simple tags if old structure exists
+                if(appData.tags && !Array.isArray(appData.tags)) {
+                    // Flatten old object tags to array
+                    let newTags = [];
+                    Object.keys(appData.tags).forEach(k => {
+                        newTags.push(k);
+                        if(Array.isArray(appData.tags[k])) newTags.push(...appData.tags[k]);
+                    });
+                    appData.tags = [...new Set(newTags)]; // Unique
+                }
+                if(!appData.tags || !Array.isArray(appData.tags)) appData.tags = ['Food', 'Transport', 'Bills'];
+            } 
+            else { 
+                const old = localStorage.getItem('splitifyData_v7_1'); 
+                if(old) { appData = JSON.parse(old); appData.tags = ['Food', 'Transport', 'Bills']; saveData(); } 
+                else openOnboarding(); 
+            }
             recalculate(); updateWelcome();
             window.onpopstate = () => document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
         };
@@ -218,12 +233,14 @@
         function openModal(id) { document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); document.getElementById('modal-'+id).classList.add('active'); history.pushState({modal: id}, null, ""); }
         function closeModal() { document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); if(history.state && history.state.modal) history.back(); }
 
-        // --- MATH ---
+        // --- MATH (FIXED SPLIT LOGIC) ---
         function recalculate() {
-            let c=0, b=0, w=0, pBal={}; for(let k in appData.people) pBal[k]=0;
+            let c=0, b=0, w=0, pBal={}; 
+            for(let k in appData.people) pBal[k]=0;
             appData.trans.forEach(t => {
                 const amt=parseInt(t.amt)||0, p=t.person, isBank=t.source==='BANK', isCur=!t.weekReset;
                 if(p && p!=='Self' && pBal[p]===undefined) pBal[p]=0;
+                
                 if(t.type==='EXPENSE') { if(isBank) b-=amt; else c-=amt; if(isCur) w+=amt; if(p && p!=='Self') pBal[p]+=amt; }
                 else if(t.type==='TRANSFER_IN'||t.type==='RECEIVED') { if(isBank) b+=amt; else c+=amt; if(p&&p!=='Self') pBal[p]-=amt; }
                 else if(t.type==='TRANSFER_OUT'||t.type==='DEBIT') { if(isBank) b-=amt; else c-=amt; if(p&&p!=='Self') pBal[p]+=amt; }
@@ -231,9 +248,16 @@
                 else if(t.type==='ACC_RECV') { b+=amt; if(p&&p!=='Self') pBal[p]-=amt; }
                 else if(t.type==='TRF_WDL') { b-=amt; c+=amt; if(isCur) w+=parseInt(t.tax||0); }
                 else if(t.type==='TRF_DEP') { c-=amt; b+=amt; if(isCur) w+=parseInt(t.tax||0); }
+                
+                // FIXED SPLIT LOGIC:
+                // SPLIT_MAIN: Deducts total cash paid. 
+                // SPLIT_SHARE: Just tracking expense statistic (Virtual).
+                // SPLIT_DEBIT: Increases friend debt (Virtual).
+                // No money is added back to cash/bank here.
                 else if(t.type==='SPLIT_MAIN') { if(isBank) b-=amt; else c-=amt; }
                 else if(t.type==='SPLIT_SHARE') { if(isCur) w+=amt; }
                 else if(t.type==='SPLIT_DEBIT') { if(p) pBal[p]+=amt; }
+                
                 else if(t.type==='BALANCE_CORRECTION') { if(t.mode==='IN') { if(isBank) b+=amt; else c+=amt; } else { if(isBank) b-=amt; else c-=amt; } }
             });
             appData.cash=c; appData.bank=b; appData.week=w; appData.people=pBal; renderUI();
@@ -255,26 +279,12 @@
             renderTransList([...appData.trans].reverse().slice(0,3), 'transList');
         }
 
-        // --- TAG SYSTEM UI ---
+        // --- TAG SYSTEM UI (Simplified) ---
         function renderTagSelectionList(containerId) {
             const container = document.getElementById(containerId);
             let html = `<div><input type="text" placeholder="Search Tags..." class="w-full p-2 text-sm border rounded-lg mb-2" onkeyup="filterTags(this)"></div><div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto" id="tagGrid">`;
-            
-            // Flatten tags for display
-            let allTags = [];
-            Object.keys(appData.tags).forEach(main => {
-                allTags.push({val: main, label: main, isMain: true});
-                appData.tags[main].forEach(sub => allTags.push({val: `${main}:${sub}`, label: sub, isMain: false, parent: main}));
-            });
-
-            allTags.forEach(t => {
-                const display = t.isMain ? t.label : `${t.parent} > ${t.label}`;
-                const style = t.isMain ? 'font-bold' : 'text-xs text-slate-600';
-                html += `
-                <div onclick="selectTagUI(this, '${t.val}')" class="tag-card flex items-center justify-between p-3 border rounded-xl bg-white cursor-pointer" data-tag="${t.val.toLowerCase()}">
-                    <span class="${style}">${t.label}</span>
-                    <div class="check-circle w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-check text-white text-[10px] opacity-0 transition"></i></div>
-                </div>`;
+            appData.tags.forEach(t => {
+                html += `<div onclick="selectTagUI(this, '${t}')" class="tag-card flex items-center justify-between p-3 border rounded-xl bg-white cursor-pointer" data-tag="${t.toLowerCase()}"><span class="font-bold text-sm">${t}</span><div class="check-circle w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-check text-white text-[10px] opacity-0 transition"></i></div></div>`;
             });
             container.innerHTML = html + '</div>';
         }
@@ -288,10 +298,19 @@
         function filterTags(input) {
             const filter = input.value.toLowerCase();
             document.querySelectorAll('.tag-card').forEach(el => {
-                const tagVal = el.getAttribute('data-tag');
-                el.style.display = tagVal.includes(filter) ? 'flex' : 'none';
+                el.style.display = el.getAttribute('data-tag').includes(filter) ? 'flex' : 'none';
             });
         }
+
+        function openTagsManager() { openModal('tags'); renderTagsManagerList(); }
+        function renderTagsManagerList() {
+            const el = document.getElementById('tagsListContainer'); el.innerHTML = '';
+            appData.tags.forEach(t => {
+                el.innerHTML += `<div class="flex justify-between items-center p-3 bg-white border rounded-xl mb-2"><span class="font-bold">${t}</span><button onclick="deleteTag('${t}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+        }
+        function addNewTag() { const n = prompt("Tag Name:"); if(n && !appData.tags.includes(n)) { appData.tags.push(n); saveData(); renderTagsManagerList(); } }
+        function deleteTag(t) { if(confirm("Delete tag: "+t+"?")) { appData.tags = appData.tags.filter(tag => tag !== t); saveData(); renderTagsManagerList(); } }
 
         // --- FORMS ---
         function openForm(type) { currentFormType=type; editTransIndex=-1; selectedTag=''; openModal('form'); renderFormContent(); }
@@ -340,8 +359,13 @@
                 const friends = Array.from(document.querySelectorAll('.split-check:checked')).map(c => c.value);
                 if(!friends.length) return alert("Select friends");
                 const share = Math.round(amt / (friends.length + 1));
+                
+                // IMPORTANT FIX: SPLIT LOGIC
+                // 1. Deduct total from source (Wallet)
                 appData.trans.push({ date, type: 'SPLIT_MAIN', amt, desc: desc+" (Total)", person: 'Self', source, tag: selectedTag });
+                // 2. Add My Share to stats (Virtual)
                 appData.trans.push({ date, type: 'SPLIT_SHARE', amt: share, desc: desc+" (My Share)", person: 'Self', tag: selectedTag });
+                // 3. Add Friend Debt (Virtual)
                 friends.forEach(p => appData.trans.push({ date, type: 'SPLIT_DEBIT', amt: share, desc, person: p, tag: selectedTag }));
             }
             else { // Transfers
@@ -354,7 +378,7 @@
             saveData(); closeModal();
         }
 
-        // --- REPORT FIX ---
+        // --- NEW REPORTS WITH GRAPHS ---
         function generateReport() {
             const from = new Date(document.getElementById('repFrom').value);
             const to = new Date(document.getElementById('repTo').value);
@@ -371,13 +395,12 @@
 
             filtered.forEach(t => {
                 total += parseInt(t.amt);
-                let mainTag = t.tag ? t.tag.split(':')[0] : 'Uncategorized';
+                let mainTag = t.tag ? t.tag : 'Uncategorized'; // Simplified
                 if(!tagData[mainTag]) tagData[mainTag] = 0; tagData[mainTag] += parseInt(t.amt);
-                tbody.innerHTML += `<tr><td class="py-2 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date} ${t.tag ? '• '+t.tag.replace(':',' > ') : ''}</div></td><td class="py-2 border-b text-right font-mono">${t.amt}</td></tr>`;
+                tbody.innerHTML += `<tr><td class="py-2 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date} ${t.tag ? '• '+t.tag : ''}</div></td><td class="py-2 border-b text-right font-mono">${t.amt}</td></tr>`;
             });
             document.getElementById('repTotal').innerText = total.toLocaleString();
 
-            // CHART SAFETY CHECK
             if(typeof Chart === 'undefined') {
                 document.getElementById('chartError').classList.remove('hidden');
             } else {
@@ -395,7 +418,7 @@
             }
         }
 
-        // Shared Utils
+        // --- UTILS ---
         function renderTransList(arr, elId) {
             const el = document.getElementById(elId); el.innerHTML = '';
             arr.forEach((t) => {
@@ -404,7 +427,7 @@
                 if(t.type.includes('EXPENSE')) { icon='fa-arrow-trend-down'; color='bg-red-100 text-red-500'; }
                 else if(['RECEIVED','ACC_RECV','TRANSFER_IN'].includes(t.type)) { icon='fa-arrow-down'; color='bg-green-100 text-green-500'; }
                 else if(['DEBIT','ACC_SENT','TRANSFER_OUT'].includes(t.type)) { icon='fa-arrow-up'; color='bg-orange-100 text-orange-500'; }
-                let tagBadge = t.tag ? `<span class="text-[9px] bg-slate-200 px-1 rounded ml-1 text-slate-600">${t.tag.split(':')[0]}</span>` : '';
+                let tagBadge = t.tag ? `<span class="text-[9px] bg-slate-200 px-1 rounded ml-1 text-slate-600">${t.tag}</span>` : '';
                 el.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm"><div class="flex items-center gap-3 overflow-hidden"><div class="w-10 h-10 rounded-full ${color} flex items-center justify-center shrink-0"><i class="fa-solid ${icon}"></i></div><div class="min-w-0"><p class="font-bold text-slate-700 truncate text-sm flex items-center">${t.desc} ${tagBadge}</p><p class="text-[10px] text-slate-400 font-bold uppercase">${t.date} • ${t.person||'Self'}</p></div></div><div class="flex items-center gap-2 pl-2"><span class="font-bold text-slate-800">${parseInt(t.amt).toLocaleString()}</span><button onclick="if(confirm('Delete?')){appData.trans.splice(${realIndex},1);saveData();renderUI();}" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button></div></div>`;
             });
         }
@@ -418,10 +441,6 @@
         function showAllHistory() { openModal('history'); renderTransList([...appData.trans].reverse(), 'fullHistoryList'); }
         function showWeekDetails() { openModal('week'); renderTransList([...appData.trans].reverse().filter(t => !t.weekReset && (t.type==='EXPENSE' || t.type==='SPLIT_SHARE')), 'weekDetailList'); }
         function openLedger(name) { openModal('ledger'); document.getElementById('ledgerName').innerText=name; const tb=document.getElementById('ledgerTableBody'); tb.innerHTML=''; appData.trans.filter(t=>t.person===name).reverse().forEach(t=>{ let d='', c=''; if(['DEBIT','ACC_SENT','TRANSFER_OUT','SPLIT_DEBIT'].includes(t.type)) d=t.amt; if(['RECEIVED','ACC_RECV','TRANSFER_IN'].includes(t.type)) c=t.amt; if(t.type==='EXPENSE') d=t.amt; if(d||c) tb.innerHTML+=`<tr><td class="p-4 border-b"><div class="font-bold">${t.desc}</div><div class="text-xs text-gray-400">${t.date}</div></td><td class="p-4 border-b text-right text-red-500 font-bold">${d}</td><td class="p-4 border-b text-right text-green-600 font-bold">${c}</td></tr>`; }); document.getElementById('ledgerTotal').innerText=Math.abs(appData.people[name]); }
-        function openTagsManager() { openModal('tags'); renderTagsList(); }
-        function renderTagsList() { const el = document.getElementById('tagsListContainer'); el.innerHTML = ''; Object.keys(appData.tags).forEach(tag => { let subHtml = appData.tags[tag].map(s => `<span class="bg-slate-100 px-2 py-1 rounded text-xs mr-1">${s}</span>`).join(''); el.innerHTML += `<div class="bg-white p-3 rounded-xl border mb-2"><div class="flex justify-between"><span class="font-bold">${tag}</span><button onclick="addSubTag('${tag}')" class="text-xs text-blue-500">+ Sub</button></div><div class="mt-2 flex flex-wrap gap-1">${subHtml}</div></div>`; }); }
-        function addNewTagRoot() { const n = prompt("Main Tag Name:"); if(n && !appData.tags[n]) { appData.tags[n]=[]; saveData(); renderTagsList(); } }
-        function addSubTag(root) { const n = prompt("Sub-tag Name:"); if(n) { appData.tags[root].push(n); saveData(); renderTagsList(); } }
         function openEditFriends() { openModal('edit-friends'); const l=document.getElementById('editFriendsList'); l.innerHTML=''; Object.keys(appData.people).forEach(p=>{ l.innerHTML+=`<div class="flex justify-between p-3 border rounded-xl mb-2"><span class="font-bold">${p}</span><div class="flex gap-2"><button onclick="renameFriend('${p}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button><button onclick="deleteFriend('${p}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div></div>`; }); }
         function addPerson() { const n=document.getElementById('newPersonName').value; if(n){ appData.people[n]=0; saveData(); document.getElementById('newPersonName').value=''; alert("Added!"); } }
         function renameFriend(o) { const n=prompt("New Name:",o); if(n&&n!==o){appData.people[n]=appData.people[o]; delete appData.people[o]; appData.trans.forEach(t=>{if(t.person===o)t.person=n}); saveData(); openEditFriends();} }
